@@ -2,15 +2,20 @@ import * as express from 'express';
 import * as http from 'http';
 import npmlog from 'npmlog';
 import { Server } from 'socket.io';
+import { CardType } from './model/card';
+import { GamePhase } from './model/game-state';
 import { Player } from './model/player';
 import { Room } from './model/room';
 import {
-  createOrGetPlayer,
-  createRoom,
-  getRoom,
-  joinRoom,
-  leaveRoom,
-} from './server/core/room-manager';
+  addCard,
+  assignCardMetadata,
+  createNewPunishmentCard,
+  getCardVotingScore, getTopMostCards,
+  voteForCard,
+} from './server/core/card-manager';
+import { createInternalState, removeInternalState } from './server/core/game-manager';
+import { createOrGetPlayer, createRoom, getRoom, joinRoom, leaveRoom } from './server/core/room-manager';
+import { InternalState } from './server/core/state';
 import { ClientToServerEvents, ServerToClientEvents, ServerToServerEvents } from './socket-types';
 
 const SERVER_PORT = +(process.env.SERVER_PORT ?? 3_000);
@@ -27,7 +32,7 @@ const start = async () => {
 
 start();
 
-const io = new Server<ClientToServerEvents, ServerToClientEvents, ServerToServerEvents, unknown >(server, {
+const io = new Server<ClientToServerEvents, ServerToClientEvents, ServerToServerEvents, unknown>(server, {
   cors: {
     origin: '*',
     methods: ["GET", "POST"],
@@ -38,6 +43,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, ServerToServer
 io.on('connection', (socket) => {
   let room: Room | undefined = undefined;
   let player: Player | undefined = undefined;
+  let internalState: InternalState | undefined = undefined;
 
   console.log('[CONNECT]', socket.id);
 
@@ -86,9 +92,19 @@ io.on('connection', (socket) => {
   });
 
   socket.on('startGame', () => {
-    // if (!room || !player) {
-    //   return;
-    // }
+    if (!room || !player) {
+      return;
+    }
+
+    removeInternalState(room.id);
+    internalState = createInternalState(room);
+
+    room.open = false;
+
+    socket.emit('update', internalState.gameState);
+    socket.to(room.id)
+        .emit('update', internalState.gameState);
+
     //
     // if (canStartSelection(room)) {
     //   room.open = false;
@@ -113,6 +129,57 @@ io.on('connection', (socket) => {
     //     startNextRound();
     //   });
     // }
+  });
+
+  socket.on('createPunishment', (punishmentText: string) => {
+    if (!player || !room || !internalState) {
+      return;
+    }
+
+    const card = createNewPunishmentCard(punishmentText);
+    assignCardMetadata(card, player, internalState);
+    addCard(card, player, internalState);
+
+    // Check if all players created punishments
+    if (internalState.gameState.playedCards.length === room.players.length) {
+      internalState.gameState.phase = GamePhase.PunishmentVoting;
+
+      socket.emit('update', internalState.gameState);
+      socket.to(room.id)
+        .emit('update', internalState.gameState);
+    }
+  });
+
+  socket.on('votePunishment', (punishmentId: number) => {
+    if (!player || !room || !internalState) {
+      return;
+    }
+
+    voteForCard(punishmentId, internalState);
+
+    // All players finished voting
+    if (getCardVotingScore(internalState) === room.players.length) {
+      internalState.gameState.phase = GamePhase.CardCreation;
+      const [voted, hidden] = getTopMostCards(internalState);
+      internalState.votedPunishment = voted;
+      internalState.hiddenPunishment = hidden;
+    }
+  });
+
+  socket.on('createCards', (cards: {type: CardType; text: string}[]) => {
+
+  });
+
+  socket.on('selectCard', (cardId: number) => {
+
+  });
+
+  socket.on('voteCard', (cardId: number) => {
+
+  });
+
+  socket.on('startNextRound', () => {
+
   });
 
   socket.on('selectBoxes', (boxes) => {

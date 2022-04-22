@@ -43,7 +43,7 @@ export interface ClientToServerEvents {
    * Player creates all cards with types (tags)
    * @param card The cards
    */
-  createCards: (card: { type: CardType; text: string }[]) => void;
+  createCards: (cards: { type: CardType; text: string }[]) => void;
 
   /**
    * Player selects a card

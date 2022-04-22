@@ -1,3 +1,57 @@
+import npmlog from 'npmlog';
+import { GamePhase, GameState } from '../../model/game-state';
+import { PlayerState } from '../../model/player';
+import { Room } from '../../model/room';
+import { InternalState, internalState } from './state';
+
+const GAME_MANAGER_LOG_PREFIX = 'game-manager';
+
+/**
+ * Remove internal state by given room-id
+ * @param roomId
+ */
+export const removeInternalState = (roomId: string) => {
+  const index = internalState.findIndex((s) => s.roomId === roomId);
+  if (index !== undefined) {
+    npmlog.info(GAME_MANAGER_LOG_PREFIX, 'Removing internal state for room %s', roomId);
+    internalState.splice(index, 1);
+  }
+};
+
+/**
+ * Create a new internal state and the initial game state with all players.
+ * @param room
+ */
+export const createInternalState = (room: Room) => {
+  const playerState: PlayerState[] = room.players.map((p) => {
+    return {
+      player: p,
+      connected: true,
+      hand: [],
+      score: 0,
+    };
+  });
+
+  const gameState: GameState = {
+    phase: GamePhase.PunishmentCreation,
+    playerState,
+    round: 0,
+    playedCards: [],
+  };
+
+  const state: InternalState = {
+    roomId: room.id,
+    nextCardId: 0,
+    punishments: [],
+    gameState,
+  };
+
+  npmlog.log(GAME_MANAGER_LOG_PREFIX, 'Create new internal state for room %s', room.id);
+
+  return state;
+};
+
+
 // import { getRandomEmojis } from '../../emojis';
 // import { Game, Phase, Round } from '../../model/game';
 // import { Room } from '../../model/room';
