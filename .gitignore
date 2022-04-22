@@ -7,7 +7,10 @@
 *.code-workspace
 # Local History for Visual Studio Code
 .history/
- 
+
+# IntelliJ
+.idea
+
 # Common credential files
 **/credentials.json
 **/client_secrets.json
