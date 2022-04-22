@@ -16,3 +16,8 @@ Yo momma is so fat, she likes {_}.
 Today {Player|Object|Place|Activity}. Tomorrow {_}.
 {Player|Object|Place|Activity} is a gateway drug to {_}.
 What can't {Player} just not get enough of?
+Who saved {Player} as "Honeybunney" in their phone?
+What's {Player}'s favourite activity.
+{Player} is hungry. What do you feed them?
+{_} is not real. It can't hurt you.
+Yet another success in {Player}'s life. And it was all thanks to {_}.
