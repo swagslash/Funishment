@@ -9,3 +9,5 @@ Why is {Player} afraid at night?
 What's {Player}'s favourite drug?
 Where does {Player} like to get off?
 Who likes {Player}?
+Who could kick {Player}'s ass?
+{Player} just died. What's the inheritance?
