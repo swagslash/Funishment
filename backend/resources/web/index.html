@@ -1,0 +1,147 @@
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" href="drag-labels.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+
+    <!-- this script allows drag&drop for .draggable into .dropzone -->
+    <script src="drag-labels.js" defer="defer"></script>
+
+    <!-- https://weeklyhow.com/shopify-draggable-tutorial/ -->
+    <!-- https://github.com/Shopify/draggable/tree/master/src/Droppable -->
+    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.2/lib/draggable.min.js"></script>
+    <!--    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.11/lib/draggable.bundle.js"></script>-->
+
+</head>
+
+<body>
+
+<div id="unset" class="outside-dropzone">
+    <div class="center-box">
+        <h1>What's in the box?</h1>
+    </div>
+    <div class="center-box">
+        <p>Place three of the items in the boxes. </p>
+    </div>
+
+
+    <!-- contains all the items for placement -->
+    <div class="fancy-drop-container center-box">
+        <div class="fancy-droppable draggable-dropzone--occupied float-left">
+            <div class="fancy-draggable">
+                <p style="position: relative; top: -20%; text-align: center; font-size: 40">🤮</p>
+            </div>
+        </div>
+        <div class="fancy-droppable draggable-dropzone--occupied float-left">
+            <div class="fancy-draggable">
+                <p style="position: relative; top: -20%; text-align: center; font-size: 40">😴</p>
+            </div>
+        </div>
+        <div class="fancy-droppable draggable-dropzone--occupied float-left">
+            <div class="fancy-draggable">
+                <p style="position: relative; top: -20%; text-align: center; font-size: 40">🤑</p>
+            </div>
+        </div>
+        <div class="fancy-droppable draggable-dropzone--occupied float-left">
+            <div class="fancy-draggable">
+                <p style="position: relative; top: -20%; text-align: center; font-size: 40">🤬</p>
+            </div>
+        </div>
+        <div class="fancy-droppable draggable-dropzone--occupied float-left">
+            <div class="fancy-draggable">
+                <p style="position: relative; top: -20%; text-align: center; font-size: 40">💩</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Using table because float is not working with drag&drop ootb -->
+
+    <table class="table-box">
+        <tr>
+            <td>
+                <div id="box1-tag" class="fancy-drop-container center-box">
+                    <div class="fancy-droppable"></div>
+                </div>
+            </td>
+
+            <td>
+                <div id="box2-tag" class="fancy-drop-container center-box">
+                    <div class="fancy-droppable"></div>
+                </div>
+            </td>
+
+            <td>
+                <div class="fancy-drop-container center-box">
+                    <div id="box3-tag" class="fancy-droppable"></div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="box1" class="dropzone ui-widget-header"></div>
+            </td>
+            <td>
+                <div id="box2" class="dropzone ui-widget-header"></div>
+            </td>
+            <td>
+                <div id="box3" class="dropzone ui-widget-header"></div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="center-box">
+        <button id="save" class="button">Save</button>
+    </div>
+
+    <div class="center-box">
+        <p> Then, apply stickers as hints for the unboxing. </p>
+    </div>
+
+    <!-- TODO create containment for the drag&drop -->
+    <div class="center-box">
+        <div>
+            <div id="😄" class="draggable ui-widget-content">
+                <p class="emoji-text">😄</p>
+            </div>
+        </div>
+        <div>
+            <div id="😂" class="draggable ui-widget-content">
+                <p class="emoji-text">😂</p>
+            </div>
+        </div>
+        <div>
+            <div id="😍" class="draggable ui-widget-content">
+                <p class="emoji-text">😍</p>
+            </div>
+        </div>
+        <div>
+            <div id="😏" class="draggable ui-widget-content">
+                <p class="emoji-text">😏</p>
+            </div>
+        </div>
+        <div>
+            <div id="🤤" class="draggable ui-widget-content">
+                <p class="emoji-text">🤤</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="marker" style="height: 10px; width: 10px">
+
+    </div>
+
+    <div id="info">
+
+    </div>
+
+
+</div>
+
+</body>
+
+</html>
