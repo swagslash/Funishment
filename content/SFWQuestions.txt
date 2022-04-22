@@ -8,3 +8,11 @@ What would {Player} never give up on?
 What would be the perfect gift for {Player}?
 How does {Player} earn his living?
 What can't {Player} get enough of.
+A match made in heaven. {Player|Object|Place|Activity} and 
+Combine {Player|Object|Place|Activity} and {Player|Object|Place|Activity} and you'll get {_}.
+Capitalism destroyed finally {_}.
+{Player|Object|Place|Activity} or {Player|Object|Place|Activity}? Neither. {_}!
+Yo momma is so fat, she likes {_}.
+Today {Player|Object|Place|Activity}. Tomorrow {_}.
+{Player|Object|Place|Activity} is a gateway drug to {_}.
+What can't {Player} just not get enough of?
