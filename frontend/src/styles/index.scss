@@ -6,6 +6,7 @@ html, body {
 
 body {
   color: #333;
+  color: #FFF;
   margin: 0;
   padding: 8px;
   box-sizing: border-box;
@@ -44,8 +45,7 @@ a {
  */
 
 body {
-  text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
-  box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
+  box-shadow: inset 0 0 5rem rgba(187, 187, 187, 0.5);
 }
 
 .cover-container {
@@ -54,7 +54,7 @@ body {
 
 
 .nav-masthead .active {
-  color: #fff;
+  color: rgb(54, 29, 29);
   border-bottom-color: #fff;
 }
 
@@ -71,15 +71,4 @@ body {
   .bd-placeholder-img-lg {
     font-size: 3.5rem;
   }
-}
-
-/**
- * This makes sure that all emojis that are converted by twemoji
- * are the same size as the surrounding text
- */
-img.emoji {
-  height: 1em;
-  width: 1em;
-  margin: 0 .05em 0 .1em;
-  vertical-align: -0.1em;
 }
