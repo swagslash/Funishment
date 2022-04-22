@@ -93,7 +93,7 @@
                 <Countdown countdown={90}/>
                 <br>
                 {#if isSelectingContent}
-                    <h1 class="text-primary" use:twemoji>👉 Pack your boxes!</h1>
+                    <h1 class="text-primary">👉 Pack your boxes!</h1>
                     <br>
                     <BoxContentSelector on:selectionChange="{updateContentSelection}"
                                         selection={contentSelection}
@@ -101,26 +101,26 @@
 
                     <br>
                     <button class="btn btn-lg btn-primary fw-bold" disabled="{incompleteContentSelection}"
-                            on:click="{saveContents}" use:twemoji>
+                            on:click="{saveContents}" >
                         👉 Choose Labels 👈
                     </button>
                 {:else }
-                    <h1 class="text-primary" use:twemoji>🏷️ Label your boxes!</h1>
+                    <h1 class="text-primary" >🏷️ Label your boxes!</h1>
                     <BoxContentSelector selection="{labelSelection}"
                                         pool="{labelPool}"
                                         groups="{contentSelection.map((c) => c?.name)}"
                                         groupSize="{3}"/>
 
                     <br>
-                    <button class="btn btn-lg btn-primary fw-bold" on:click="{sendSelection}" use:twemoji>
+                    <button class="btn btn-lg btn-primary fw-bold" on:click="{sendSelection}" >
                         👉 Ship it! 👈
                     </button>
                 {/if}
             {:else}
-                <h2 use:twemoji>⏳ Waiting for <span class="text-primary">{game.current.name}</span> to finish decorating their boxes! ⏳</h2>
+                <h2 >⏳ Waiting for <span class="text-primary">{game.current.name}</span> to finish decorating their boxes! ⏳</h2>
             {/if}
         {:else if game.phase === Phase.Guessing}
-            <h1 class="text-primary" use:twemoji>🤔 Guessing phase</h1>
+            <h1 class="text-primary" >🤔 Guessing phase</h1>
             {#if game.current.id !== userId}
                 <Countdown countdown={60}/>
                 <h2>Guess what's in <span class="text-primary">{game.current.name}</span>'s box:</h2>
@@ -136,29 +136,29 @@
                     <h2>⏳ Waiting for other players! ⏳</h2>
                 {:else}
                     <button class="btn btn-lg btn-primary fw-bold"
-                            on:click="{guessContents}" use:twemoji>
+                            on:click="{guessContents}" >
                         👉 Guess 👈
                     </button>
                 {/if}
 
             {:else}
-                <h2 use:twemoji>⏳ Waiting for others to guess your boxes! ⏳</h2>
+                <h2 >⏳ Waiting for others to guess your boxes! ⏳</h2>
                 <Countdown countdown={60}/>
             {/if}
         {:else if game.phase === Phase.Scoring}
             <AfterGuessOverview currentId={game.current.id} players={players} boxes={game.round.boxes} guesses={game.round.guesses} />
 
-            <h1 use:twemoji>🏆 Current Scores</h1>
+            <h1 >🏆 Current Scores</h1>
             <ScoreList players={players} scores={game.scores} myUserId={userId} currentUserId={game.current.id}/>
 
             <br>
 
             {#if game.current.id === userId}
                 <h4>It's your turn next!</h4>
-                <h4 use:twemoji>Time for some payback 💰↩️</h4>
+                <h4 >Time for some payback 💰↩️</h4>
                 <br>
                 <button class="btn btn-lg btn-primary fw-bold" type="submit"
-                        on:click="{() => dispatch('continueNextRound')}" use:twemoji>
+                        on:click="{() => dispatch('continueNextRound')}" >
                     👉 Next Round 👈
                 </button>
             {:else}
