@@ -1,0 +1,15 @@
+{Player}'s car
+A banana
+Two pints of lager
+A pan
+{Player}'s phone
+An apple
+{Player}'s glasses
+{Player}'s hidden journal
+{Player}'s pants
+pants
+{Player}'s clothes
+{Player}'s underwear
+A egg
+A chicken
+A dog
