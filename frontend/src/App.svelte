@@ -2,7 +2,7 @@
     <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
         <header class="mb-auto">
             <div>
-                <h3 class="float-md-start mb-0"><img class="emoji" src="box_open_100.png" /> What's in the Box?</h3>
+                <h3 class="float-md-start mb-0">⚖️ Funishment</h3>
                 <nav class="nav nav-masthead justify-content-center float-md-end">
                     <span class="nav-link" title={userId}>
                         {#if username}<span title={userId}>{username}</span>{/if}
@@ -25,7 +25,7 @@
         {:else}
             {#if username && room}
                 <div id="chat-container">
-                    <PlayerList room={room} players={room.players} lobbyId={room.id} myUserId={userId}/>
+                    <PlayerList room={room} players={room.players} lobbyId={room.id} myUserId={userId} />
                     <br>
                     {#if username === room.host.name}
                         <p>You are hosting this lobby.</p>
@@ -33,10 +33,10 @@
                             <p>⏳ Wait for more players to start the game. ⏳</p>
                         {/if}
                         <button class="btn btn-lg btn-primary fw-bold" on:click={hostStartGame}
-                                disabled="{startGameDisabled}" use:twemoji>👉 Start Game 👈
+                                disabled="{startGameDisabled}">👉 Start Game 👈
                         </button>
                     {:else}
-                        <p use:twemoji>⏳ Wait for your host to start the game. ⏳</p>
+                        <p >⏳ Wait for your host to start the game. ⏳</p>
                     {/if}
                 </div>
             {:else}
@@ -111,8 +111,6 @@
 </style>
 
 <script lang="ts">
-
-    import {twemoji} from 'svelte-twemoji';
     import io from "socket.io-client";
 
     import PlayerList from './PlayerList.svelte';

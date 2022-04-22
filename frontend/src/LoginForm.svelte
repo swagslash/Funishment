@@ -1,5 +1,4 @@
 <script lang="ts">
-    import {twemoji} from 'svelte-twemoji';
     import {createEventDispatcher} from 'svelte';
 
     export let lobbyId: string;
@@ -21,14 +20,13 @@
 
 <main class="px-3">
     <div id="pre-lobby">
-        <h1 use:twemoji>💖 Play now!</h1>
+        <h1>Play now!</h1>
         <p class="lead">To start playing, either create a room or join one via ID!</p>
         <div class="form-group">
             <label for="usernameField">Username</label>
             <input type="text" class="form-control" bind:value={username} id="usernameField" on:input={userNameChanged}
                    placeholder="Enter username">
-            <small id="emailHelp" class="form-text text-muted">Choosing inappropriate usernames will result in no
-                penalty. I'm not your dad.</small>
+            <small id="usernameHelp" class="form-text text-muted">Make sure to chose a unique user name that people know you by.</small>
         </div>
         <div class="form-group">
             <label for="lobbyField">Lobby ID</label>
@@ -37,14 +35,14 @@
 
             {#if roomNotFound}
                 <br>
-                <p>Room not found</p>
+                <p class="bg-danger badge" style="padding: 10px">Room not found</p>
             {/if}
         </div>
 
         <br/>
 
         <button class="btn btn-lg btn-primary fw-bold" type="submit" disabled="{!canCreateOrEnter}"
-                on:click={onCreateOrJoin} use:twemoji>
+                on:click={onCreateOrJoin} >
             {#if lobbyId}👉 Enter 👈{:else}👉 Create 👈{/if}
         </button>
     </div>
