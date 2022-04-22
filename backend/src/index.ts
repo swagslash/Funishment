@@ -1,48 +1,33 @@
 import * as express from 'express';
 import * as http from 'http';
+import npmlog from 'npmlog';
 import { Server } from 'socket.io';
-import { Phase } from './model/game';
 import { Player } from './model/player';
 import { Room } from './model/room';
 import {
-  calculateScores,
-  canGuess,
-  canStartGuessing,
-  canStartSelection, clearGuessingTimeout, clearSelectionTimeout,
-  createOrGetGame,
-  setGamePhase,
-  setNextPlayer, startGuessingTimeout, startSelectionTimeout,
-} from './server/core/game-manager';
-import {
-  closeRoom,
   createOrGetPlayer,
   createRoom,
   getRoom,
   joinRoom,
   leaveRoom,
-  removePlayer,
 } from './server/core/room-manager';
-import { SocketData } from './socket-data';
 import { ClientToServerEvents, ServerToClientEvents, ServerToServerEvents } from './socket-types';
 
 const SERVER_PORT = +(process.env.SERVER_PORT ?? 3_000);
+const SERVER_LOG_PREFIX = 'server';
 
 const app = express();
 const server = http.createServer(app);
 
 const start = async () => {
   server.listen(SERVER_PORT, () => {
-    console.log('Listening at port ', SERVER_PORT);
+    npmlog.info(SERVER_LOG_PREFIX, 'Starting server, listening at port %s', SERVER_PORT);
   });
 };
 
 start();
 
-app.get('/', (req, res) => {
-  res.send('hello world');
-});
-
-const io = new Server<ClientToServerEvents, ServerToClientEvents, ServerToServerEvents, SocketData>(server, {
+const io = new Server<ClientToServerEvents, ServerToClientEvents, ServerToServerEvents, unknown >(server, {
   cors: {
     origin: '*',
     methods: ["GET", "POST"],
@@ -63,10 +48,8 @@ io.on('connection', (socket) => {
       leaveRoom(room, player);
     }
 
-    room = createRoom();
     player = createOrGetPlayer(playerName, socket.id);
-
-    joinRoom(room, player, true);
+    room = createRoom(player);
 
     socket.join(room.id);
     socket.emit('roomCreated', room);
@@ -83,19 +66,19 @@ io.on('connection', (socket) => {
 
     if (room === undefined) {
       socket.emit('roomNotFound');
+      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s not found', roomId);
       return;
     }
 
     player = createOrGetPlayer(playerName, socket.id);
-    const success = joinRoom(room, player, false);
+    const success = joinRoom(room, player);
 
     if (success) {
       socket.join(room.id);
-      socket.emit('roomJoined', room);
 
       socket.to(room.id)
-        .emit('updatePlayers', room);
-      socket.emit('updatePlayers', room);
+        .emit('roomUpdated', room);
+      socket.emit('roomUpdated', room);
     } else {
       // Game is open, no new players allowed
       socket.emit('roomClosed');
@@ -103,111 +86,111 @@ io.on('connection', (socket) => {
   });
 
   socket.on('startGame', () => {
-    if (!room || !player) {
-      return;
-    }
-
-    if (canStartSelection(room)) {
-      room.open = false;
-      room.game = createOrGetGame(room);
-
-      if (room.game.current !== player) {
-        // This player cannot start a game
-        return;
-      }
-
-      console.log('guesses', room.game.round.guesses);
-
-      setGamePhase(room, Phase.Selection);
-
-      socket.emit('gameStarted', room.game);
-      socket.to(room.id)
-        .emit('gameStarted', room.game);
-
-      clearSelectionTimeout(room);
-      startSelectionTimeout(room, () => {
-        console.log('[GAME][SELECTING TIMEOUT]', room.id);
-        startNextRound();
-      });
-    }
+    // if (!room || !player) {
+    //   return;
+    // }
+    //
+    // if (canStartSelection(room)) {
+    //   room.open = false;
+    //   room.game = createOrGetGame(room);
+    //
+    //   if (room.game.current !== player) {
+    //     // This player cannot start a game
+    //     return;
+    //   }
+    //
+    //   console.log('guesses', room.game.round.guesses);
+    //
+    //   setGamePhase(room, Phase.Selection);
+    //
+    //   socket.emit('gameStarted', room.game);
+    //   socket.to(room.id)
+    //     .emit('gameStarted', room.game);
+    //
+    //   clearSelectionTimeout(room);
+    //   startSelectionTimeout(room, () => {
+    //     console.log('[GAME][SELECTING TIMEOUT]', room.id);
+    //     startNextRound();
+    //   });
+    // }
   });
 
   socket.on('selectBoxes', (boxes) => {
-    if (!room || !player) {
-      return;
-    }
-
-    if (canStartGuessing(room)) {
-
-      clearSelectionTimeout(room);
-      clearGuessingTimeout(room);
-      startGuessingTimeout(room, () => {
-        console.log('[GAME][GUESS TIMEOUT]', room.id);
-        startNextRound();
-      });
-
-      setGamePhase(room, Phase.Guessing);
-      console.log('[GAME][BOXES]', room.id, player.name, boxes);
-      room.game.round.boxes = boxes;
-
-      socket.to(room.id)
-        .emit('guessBoxes', room.game);
-      socket.emit('guessBoxes', room.game);
-    }
+    // if (!room || !player) {
+    //   return;
+    // }
+    //
+    // if (canStartGuessing(room)) {
+    //
+    //   clearSelectionTimeout(room);
+    //   clearGuessingTimeout(room);
+    //   startGuessingTimeout(room, () => {
+    //     console.log('[GAME][GUESS TIMEOUT]', room.id);
+    //     startNextRound();
+    //   });
+    //
+    //   setGamePhase(room, Phase.Guessing);
+    //   console.log('[GAME][BOXES]', room.id, player.name, boxes);
+    //   room.game.round.boxes = boxes;
+    //
+    //   socket.to(room.id)
+    //     .emit('guessBoxes', room.game);
+    //   socket.emit('guessBoxes', room.game);
+    // }
   });
 
   socket.on('guessBoxes', (guess) => {
-    if (!room || !player) {
-      return;
-    }
-
-    if (canGuess(room)) {
-      console.log('[GAME][GUESS]', room.id, player.name, guess);
-      room.game.round.guesses[player.id] = guess;
-
-      const alreadyGuessed = Object.keys(room.game.round.guesses).length;
-      const maxGuesses = room.players.length - 1;               // -1 for active player
-
-      console.log('already guessed', alreadyGuessed);
-      console.log('players to guess', room.players.length - 1);
-
-      if (alreadyGuessed === maxGuesses) {
-        clearGuessingTimeout(room);
-        startNextRound();
-      } else {
-        console.log('[GAME][GUESS MISSING]', room.id, maxGuesses - alreadyGuessed);
-      }
-    }
+    // if (!room || !player) {
+    //   return;
+    // }
+    //
+    // if (canGuess(room)) {
+    //   console.log('[GAME][GUESS]', room.id, player.name, guess);
+    //   room.game.round.guesses[player.id] = guess;
+    //
+    //   const alreadyGuessed = Object.keys(room.game.round.guesses).length;
+    //   const maxGuesses = room.players.length - 1;               // -1 for active player
+    //
+    //   console.log('already guessed', alreadyGuessed);
+    //   console.log('players to guess', room.players.length - 1);
+    //
+    //   if (alreadyGuessed === maxGuesses) {
+    //     clearGuessingTimeout(room);
+    //     startNextRound();
+    //   } else {
+    //     console.log('[GAME][GUESS MISSING]', room.id, maxGuesses - alreadyGuessed);
+    //   }
+    // }
   });
 
   socket.on('disconnect', () => {
-    console.log('[DISCONNECT]', socket.id);
-    if (player && room) {
-      removePlayer(player);
-
-      if (room.host === player) {
-        closeRoom(room);
-
-        socket.to(room.id)
-          .emit('roomClosed');
-        socket.emit('roomClosed');
-      } else {
-        leaveRoom(room, player);
-
-        socket.to(room.id)
-          .emit('updatePlayers', room);
-        socket.emit('updatePlayers', room);
-      }
-    }
+    // console.log('[DISCONNECT]', socket.id);
+    // if (player && room) {
+    //   removePlayer(player);
+    //
+    //   if (room.host === player) {
+    //     closeRoom(room);
+    //
+    //     socket.to(room.id)
+    //       .emit('roomClosed');
+    //     socket.emit('roomClosed');
+    //   } else {
+    //     leaveRoom(room, player);
+    //
+    //     socket.to(room.id)
+    //       .emit('updatePlayers', room);
+    //     socket.emit('updatePlayers', room);
+    //   }
+    // }
   });
 
   const startNextRound = () => {
-    calculateScores(room);
-    setNextPlayer(room);
-    setGamePhase(room, Phase.Scoring);
-
-    socket.to(room.id)
-      .emit('reportScores', room.game);
-    socket.emit('reportScores', room.game);
+    // calculateScores(room);
+    // setNextPlayer(room);
+    // setGamePhase(room, Phase.Scoring);
+    //
+    // socket.to(room.id)
+    //   .emit('reportScores', room.game);
+    // socket.emit('reportScores', room.game);
   };
 });
