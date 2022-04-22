@@ -1,34 +1,18 @@
-import { Box, Game } from './model/game';
+import { GameState } from './model/game-state';
 import { Room } from './model/room';
 
 export interface ServerToClientEvents {
   // Room actions
   roomCreated: (room: Room) => void;
-  roomJoined: (room: Room) => void;
-  updatePlayers: (room: Room) => void;
+  roomUpdated: (room: Room) => void;
   roomClosed: () => void;
   roomNotFound: () => void;
 
-  // Selection Phase
   /**
-   * Starts the game for all players. Game specifies active player
+   * Send the whole game state to the client
+   * @param state game state
    */
-  gameStarted: (game: Game) => void;
-
-  // Guessing Phase
-  /**
-   * Instructs other players to select boxes
-   * @param payload
-   */
-  guessBoxes: (game: Game) => void;
-
-
-  // Scoring Phase
-  /**
-   * All boxes guessed, report calculated scores
-   * @param payload
-   */
-  reportScores: (game: Game) => void;
+  update: (state: GameState) => void;
 }
 
 export interface ClientToServerEvents {
@@ -40,7 +24,8 @@ export interface ClientToServerEvents {
   // Lobby actions
   startGame: () => void;
 
-  // Selection Phase
+  // Punishment selection
+  // createPunishment
   selectBoxes: (boxes: Box[]) => void;
 
   // Guessing Phase
