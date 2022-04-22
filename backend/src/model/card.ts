@@ -18,6 +18,6 @@ export interface Card {
 
 export interface PlayedCard {
   card: Card;
-  player: Player;
+  dealer: Player;
   votes: number;
 }

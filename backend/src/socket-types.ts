@@ -1,3 +1,4 @@
+import { CardType } from './model/card';
 import { GameState } from './model/game-state';
 import { Room } from './model/room';
 
@@ -25,15 +26,41 @@ export interface ClientToServerEvents {
   startGame: () => void;
 
   // Punishment selection
-  // createPunishment
-  selectBoxes: (boxes: Box[]) => void;
 
-  // Guessing Phase
-  guessBoxes: (guesses: string[]) => void;
+  /**
+   * Player creates a punishment
+   * @param punishmentText Punishment display text
+   */
+  createPunishment: (punishmentText: string) => void;
 
-  // Scoring Phase
+  /**
+   * Player votes for a punishment
+   * @param punishmentId Id of the punishment card
+   */
+  votePunishment: (punishmentId: number) => void;
 
-  // Misc actions
+  /**
+   * Player creates all cards with types (tags)
+   * @param card The cards
+   */
+  createCards: (card: { type: CardType; text: string }[]) => void;
+
+  /**
+   * Player selects a card
+   * @param cardId Card id of the selected card.
+   */
+  selectCard: (cardId: number) => void;
+
+  /**
+   * Player votes for a card other than himself
+   * @param cardId Card id of the voted card
+   */
+  voteCard: (cardId: number) => void;
+
+  /**
+   * Host player starts next round
+   */
+  startNextRound: () => void;
 }
 
 export interface ServerToServerEvents {
