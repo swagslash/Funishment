@@ -102,6 +102,45 @@ socket.on('update', (state) => {
 
         socket.emit('selectCard', selection.id);
       }, 3_000);
+
+    case GamePhase.CardVoting:
+      npmlog.info('round', 'Card voting %s', state.playedCards);
+
+      setTimeout(() => {
+        const index = Math.floor(Math.random() * state.playedCards.length);
+        const vote = state.playedCards[index];
+
+        npmlog.info('round', 'Voting for %s', vote.card);
+
+        socket.emit('voteCard', vote.card.id);
+      }, 3_000);
+
+      break;
+
+    case GamePhase.CardResults:
+      npmlog.info('round', 'Card results');
+      const results = state.playedCards.map(({card, votes}) => {
+        return {
+          'id': card.id,
+          'text': card.text,
+          'votes': votes,
+        };
+      });
+      npmlog.info('round', 'Results: %s', results);
+
+      setTimeout(() => {
+        npmlog.info('round', 'Start next round');
+        socket.emit('startNextRound');
+      }, 3_000);
+    case GamePhase.Scoreboard:
+      npmlog.info('round', 'Scoreboard', state.playerState.map((ps) => {
+        return {
+          'player': ps.player.name,
+          'score': ps.score,
+        };
+      }));
+
+      break;
   }
 
   gameState = state;

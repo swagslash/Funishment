@@ -242,7 +242,6 @@ io.on('connection', (socket) => {
       ];
       internalState.questions = loadQuestions(room.nsfw, internalState.cardPool, internalState.predefinedCards);
 
-
       handoutCards(internalState);
 
       startNextRound();
