@@ -14,6 +14,7 @@
                 </nav>
             </div>
         </header>
+
         {#if kitchenSinkEnabled}
             <KitchenSink></KitchenSink>
         {/if}
@@ -129,6 +130,12 @@
     import GameBoard from "./GameBoard.svelte";
     import {GameState} from './model/game-state';
     import {Room} from './model/room';
+    import {Card, CardType} from './model/card';
+    import {Question} from './model/question';
+    import EditableCardComponent from "src/EditableCardComponent.svelte";
+    import {CardType} from "src/model/card";
+    import {Player} from "src/model/player";
+    import VotingComponent from "src/VotingComponent.svelte";
     import KitchenSink from "./KitchenSink.svelte";
 
     let game: GameState;
@@ -218,5 +225,9 @@
 
     function nextRound() {
         hostStartGame();
+    }
+
+    function handleVoting(e:any) {
+        console.log(e.detail.id);
     }
 </script>

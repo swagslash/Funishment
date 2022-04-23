@@ -1,23 +1,31 @@
-What would {Player|Person} do at {Place}?
+What would {Player|Person} do {Place}?
 What secret do {Player} and {Player} share?
-What would you find at {Player}'s home?
-Where would {Player} never go?
-Who lives at {Place}?
-What is {Player}'s favourite activity?
-What would {Player} never give up on?
-What would be the perfect gift for {Player}?
-How does {Player} earn his living?
-What can't {Player} get enough of.
-A match made in heaven. {Player|Object|Place|Activity} and 
-Combine {Player|Object|Place|Activity} and {Player|Object|Place|Activity} and you'll get {_}.
-Capitalism destroyed finally {_}.
-{Player|Object|Place|Activity} or {Player|Object|Place|Activity}? Neither. {_}!
+What would you find at {Player|Person}'s home?
+Where would {Player|Person} never go?
+Who lives {Place}?
+What is {Player|Person}'s favourite activity?
+What would {Player|Person} never give up?
+What would be the perfect gift for {Player|Person}?
+How does {Player|Person} earn their living?
+What can't {Player|Person} get enough of?
+A match made in heaven: {Player|Person|Object|Place|Activity} and {_}.
+Combine {Player|Person|Object} and {Place|Activity} and you'll get {_}.
+Capitalism finally destroyed {_}.
+{Person} or {Person}? Neither. {_}!
+{Object} or {Object}? Neither. {_}!
+{Place} or {Place}? Neither. {_}!
+{Activity} or {Activity}? Neither. {_}!
 Yo momma is so fat, she likes {_}.
 Today {Player|Object|Place|Activity}. Tomorrow {_}.
 {Player|Object|Place|Activity} is a gateway drug to {_}.
-What can't {Player} just not get enough of?
-Who saved {Player} as "Honeybunney" in their phone?
-What's {Player}'s favourite activity.
-{Player} is hungry. What do you feed them?
-{_} is not real. It can't hurt you.
-Yet another success in {Player}'s life. And it was all thanks to {_}.
+What can't {Player|Person} get enough of?
+Who saved {Player} as "Honeybunny" in their phone?
+What's {Player|Person}'s favourite activity.
+{Player|Person} is hungry. What do you feed them?
+{_} is not a real thing. It can't hurt you.
+Yet another success in {Player|Person}'s life. And it was all thanks to {_}.
+Finally, I did it! I created {_}!
+Who would love to live {Place}?
+What does {Player|Person} secretly have on their phone?
+{Person|Player} is a hunter. What is their prey?
+What does {Player|Person} spend their free time on?

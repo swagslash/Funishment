@@ -4,7 +4,6 @@
 
   const dispatch = createEventDispatcher();
 
-  export let text: string;
   export let card: Card;
 
   export let playable = false;
@@ -21,10 +20,12 @@
     [CardType.Activity, "Activity"],
     [CardType.Person, "Person"],
     [CardType.Place, "Place"],
+    [CardType.Punishment, "Punishment"],
   ]);
 
   function onVote() {
     console.log("voted for " + card.id);
+    votedFor = true;
     dispatch("voted", { id: card.id });
   }
 </script>
@@ -46,6 +47,7 @@
            class:person={card.type === CardType.Person}
            class:place={card.type === CardType.Place}
            class:activity={card.type === CardType.Activity}
+           class:punishment={card.type === CardType.Punishment}
       >
         {typeToStringMap.get(card.type)}
       </div>
@@ -53,7 +55,7 @@
     <div class="card-body">
       <h5 class="card-title text-dark" class:presenterTheme>{card.text}</h5>
       {#if showAuthor}<p class="card-text">
-          <small class="text-muted">by {card.author}</small>
+          <small class="text-muted">by {card.author.name}</small>
         </p>{/if}
         {#if votedFor}<p class="card-text">
           <small class="text-muted">You voted for this.</small>
@@ -61,7 +63,7 @@
     </div>
     {#if votable}
       <div class="card-footer text-muted">
-        <a href="#" on:click={onVote} class="card-link">🔥 Vote</a>
+        <button on:click={onVote} class="btn btn-outline-secondary">🔥 Vote</button>
       </div>
     {/if}
   </div>
@@ -117,6 +119,11 @@
 
   .place {
     background-color: #198754;
+    color: white;
+  }
+
+  .punishment {
+    background-color: #dc3545;
     color: white;
   }
 

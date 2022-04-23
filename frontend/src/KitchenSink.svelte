@@ -6,6 +6,8 @@
     import {Player} from "src/model/player";
     import {Card, CardType} from "src/model/card";
     import CardPresenter from "src/CardPresenter.svelte";
+    import CardCreatorComponent from "src/CardCreatorComponent.svelte";
+    import PunishmentCreatorComponent from "src/PunishmentCreatorComponent";
 
     let examplePlayer: Player = {id: '1', name: 'W8D7'};
     let exampleCard: Card = {
@@ -36,27 +38,35 @@
         author: examplePlayer
     };
 
+    let exampleCardPunischment: Card = {
+        type: CardType.Punishment,
+        id: 5,
+        text: 'Sexually eating a Banana',
+        author: examplePlayer
+    };
+
     let cards: Card[] = [exampleCard, exampleCardActivity, exampleCardPerson, exampleCardPlace]
     let exampleQuestion: Question = {text: "How fat is Andi's aunt?"}
 </script>
 
 <QuestionComponent question="{exampleQuestion}"></QuestionComponent>
 <CardPresenter cards="{cards}"></CardPresenter>
-<EditableCardComponent cardType="{CardType.Object}"></EditableCardComponent>
-<div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">
-    <CardComponent text="Your momma" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" isWinner score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" showType card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" showType card="{exampleCardActivity}"></CardComponent>
-    <CardComponent text="Your momma" showType card="{exampleCardPerson}"></CardComponent>
-    <CardComponent text="Your momma" showType card="{exampleCardPlace}"></CardComponent>
-    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" votedFor score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
-    <CardComponent text="Your momma" playable score="{5}" card="{exampleCard}"></CardComponent>
-</div>
+<CardCreatorComponent punishment="{exampleCardPunischment}"></CardCreatorComponent>
+<PunishmentCreatorComponent></PunishmentCreatorComponent>
+<!--<div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">-->
+<!--    <CardComponent text="Your momma" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" isWinner score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" showType card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" showType card="{exampleCardActivity}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" showType card="{exampleCardPerson}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" showType card="{exampleCardPlace}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" votedFor score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--    <CardComponent text="Your momma" playable score="{5}" card="{exampleCard}"></CardComponent>-->
+<!--</div>-->
