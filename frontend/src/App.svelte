@@ -14,6 +14,8 @@
                 </nav>
             </div>
         </header>
+        <QuestionComponent question="{exampleQuestion}"></QuestionComponent>
+        <EditableCardComponent cardType="{CardType.Object}"></EditableCardComponent>
         <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">
                     <CardComponent text="Your momma" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" isWinner score="{5}" card="{exampleCard}"></CardComponent>
@@ -28,9 +30,6 @@
                     <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" playable score="{5}" card="{exampleCard}"></CardComponent>
         </div>
-
-        
-
 
         {#if game}
             <GameBoard on:boxesSelected={hostSelectBoxes}
@@ -138,12 +137,16 @@
     import PlayerList from './PlayerList.svelte';
     import LoginForm from './LoginForm.svelte';
     import CardComponent from './CardComponent.svelte';
+    import QuestionComponent from './QuestionComponent.svelte';
 
     import GameBoard from "./GameBoard.svelte";
     import {GameState} from './model/game-state';
     import {Room} from './model/room';
     import {Card} from './model/card';
+    import {Question} from './model/question';
 import { text } from "svelte/internal";
+    import EditableCardComponent from "src/EditableCardComponent.svelte";
+    import {CardType} from "src/model/card";
 
     let game: GameState;
     let userId: string;
@@ -151,6 +154,7 @@ import { text } from "svelte/internal";
     let room: Room;
 
     let exampleCard: Card = { id: 1, text: 'A huge bage of dirty skittles boys', author: { id: 1, name: 'W8D7' }}
+    let exampleQuestion: Question = { text: "How fat is Andi's aunt?" }
 
     let roomNotFound: boolean = false;
     let startGameDisabled: boolean = false;
