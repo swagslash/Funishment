@@ -16,11 +16,33 @@ export const loadLinesFromDisk = (txtPath: string) => {
 };
 
 /**
+ * Annoyingly, the cards contain {Player} placeholders which are uniquely replaced by player names here.
+ * @param cardText
+ * @param playerNames
+ */
+export const parseCardText = (cardText: string, playerNames: string[]): string => {
+    let placeholders: RegExpExecArray[] = [];
+
+    const placeholderRegex = /\{\w+}/g;
+    let matches;
+    while (matches = placeholderRegex.exec(cardText)) {
+        placeholders.push(matches);
+    }
+
+    let shuffledPlayerNames =  [...playerNames].sort(() => 0.5 - Math.random())
+    placeholders.forEach(placeholder =>{
+        cardText = cardText.replace(placeholder[0], shuffledPlayerNames.pop())
+    })
+
+    return cardText;
+};
+
+/**
  * Loads all cards for the cardType from disk. Also considers the nsfw flag.
  * @param cardTypeString cardType as called by the files
  * @param cardType
  */
-export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsfw: boolean): Card[] => {
+export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsfw: boolean, playerNames: string[]): Card[] => {
     let cardTexts: string[] = [];
 
     if (nsfw) {
@@ -33,40 +55,70 @@ export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsf
             id: nextCardId(),
             type: cardType,
             author: null,
-            text: text
+            text: parseCardText(text, playerNames)
         };
         return card;
     });
 };
 
 /**
- * Returns a replacement card for the matching placeholder type.
- * @param typePlaceholder e.g., "{Person}"
+ * Loads all cards for all types in one large array.
+ * @param nsfw
+ * @param playerNames
+ */
+export const loadCardsForAllTypes = (nsfw: boolean, playerNames: string[]): Card[] => {
+    const cards: Card[] = [];
+
+    cards.push(...loadCardsForType('Activities', CardType.Activity, nsfw, playerNames));
+    cards.push(...loadCardsForType('Objects', CardType.Object, nsfw, playerNames));
+    cards.push(...loadCardsForType('Persons', CardType.Person, nsfw, playerNames));
+    cards.push(...loadCardsForType('Places', CardType.Place, nsfw, playerNames));
+
+    // todo added for debug
+    // cards.push(...loadCardsForType('Persons', CardType.Player, nsfw, playerNames));
+
+    return cards;
+};
+
+
+/**
+ * Returns a replacement card for the matching placeholder type(s).
+ * @param typePlaceholderOptions e.g., "{Player|Person}" -> ["Player", "Person"]
  * @param cards
  * @param usedCards cards already used, won't be used again.
  */
-export const getCardForTypePlaceholder = (typePlaceholder: string, cards: Card[], usedCards: Card[]): Card => {
-    let filteredCards = [];
+export const getCardForTypePlaceholder = (typePlaceholderOptions: string[], cards: Card[], usedCards: Card[]): Card => {
+    let typeOptions: CardType[] = [];
 
-    if (typePlaceholder === "{Player}") {
-        filteredCards = cards.filter(c => c.type === CardType.Player)
-    } else if (typePlaceholder === "{Person}") {
-        filteredCards = cards.filter(c => c.type === CardType.Person)
-    } else if (typePlaceholder === "{Object}") {
-        filteredCards = cards.filter(c => c.type === CardType.Object)
-    } else if (typePlaceholder === "{Place}") {
-        filteredCards = cards.filter(c => c.type === CardType.Place)
-    } else if (typePlaceholder === "{Activity}") {
-        filteredCards = cards.filter(c => c.type === CardType.Activity)
-    } else {
-        console.error("Encountered unknown placeholder: ", typePlaceholder);
+    if (typePlaceholderOptions.includes("Player")) {
+       typeOptions.push(CardType.Player);
+    }
+    if (typePlaceholderOptions.includes("Person")) {
+        typeOptions.push(CardType.Person);
+    }
+    if (typePlaceholderOptions.includes("Object") ){
+        typeOptions.push(CardType.Object);
+    }
+    if (typePlaceholderOptions.includes("Place")) {
+        typeOptions.push(CardType.Place);
+    }
+    if (typePlaceholderOptions.includes( "Activity")) {
+        typeOptions.push(CardType.Activity);
+    }
+    if (typePlaceholderOptions.length == 1 && typePlaceholderOptions[0] === "_") {
+        // handled without card.
+        typeOptions = [];
     }
 
-    // randomly select a new card
-    return filteredCards
+    return cards
+        // cards with the correct type(s)
+        .filter(c => typeOptions.includes(c.type))
+        // unique cards per question
         .filter(fc => usedCards.length == 0 || !usedCards.map(uc => uc.id).includes(fc.id))
+        // shuffle
         .sort(() => 0.5 - Math.random())
-        [0] || [];
+        // first or null
+        [0];
 }
 
 /**
@@ -77,7 +129,7 @@ export const getCardForTypePlaceholder = (typePlaceholder: string, cards: Card[]
  */
 export const parseQuestionText = (questionText: string, userCards: Card[], predefinedCards: Card[]): string => {
     // detect placeholders
-    const placeholderRegex = /\{(?<type>\w+)}/g;
+    const placeholderRegex = /\{(\w|\|)+}/g;
     let placeholders: RegExpExecArray[] = [];
     let matches;
     while (matches = placeholderRegex.exec(questionText)) {
@@ -88,11 +140,12 @@ export const parseQuestionText = (questionText: string, userCards: Card[], prede
     let replacementCards: Card[] = [];
     placeholders.forEach(placeholder => {
         const rawPlaceholder: string = placeholder[0];
+        let placeholderOptions: string[] = rawPlaceholder.slice(1, -1).split('|');
 
         if (Math.random() < PROB_USER_CARD_FILLS_QUESTION) {
-            replacementCards.push(getCardForTypePlaceholder(rawPlaceholder, userCards, replacementCards))
+            replacementCards.push(getCardForTypePlaceholder(placeholderOptions, userCards, replacementCards))
         } else {
-            replacementCards.push(getCardForTypePlaceholder(rawPlaceholder, predefinedCards, replacementCards))
+            replacementCards.push(getCardForTypePlaceholder(placeholderOptions, predefinedCards, replacementCards))
         }
     });
 
@@ -145,26 +198,9 @@ export const loadQuestions = (nsfw: boolean, userCards: Card[], predefinedCards:
     return questions;
 };
 
-/**
- * Loads all cards for all types in one large array.
- * @param nsfw
- */
-export const loadCardsForAllTypes = (nsfw: boolean): Card[] => {
-    const cards: Card[] = [];
-
-    cards.push(...loadCardsForType('Activities', CardType.Activity, nsfw));
-    cards.push(...loadCardsForType('Objects', CardType.Object, nsfw));
-    cards.push(...loadCardsForType('Persons', CardType.Person, nsfw));
-    cards.push(...loadCardsForType('Places', CardType.Place, nsfw));
-
-    cards.push(...loadCardsForType('Persons', CardType.Player, nsfw));
-
-    return cards;
-};
-
 
 // console.log(
 //     loadQuestions(false,
-//         loadCardsForAllTypes(true),
-//         loadCardsForAllTypes(true))
+//         loadCardsForAllTypes(false, ["Alex", "Andi"]),
+//         loadCardsForAllTypes(false, ["Alex", "Andi"]))
 // );
