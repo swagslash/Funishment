@@ -171,10 +171,9 @@ export const parseQuestionText = (questionText: string, userCards: Card[], prede
  * Load 5 questions
  * @param nsfw
  * @param userCards
- * @param playerCards
  * @param predefinedCards
  */
-export const loadQuestions = (nsfw: boolean, userCards: Card[], playerCards: Card[], predefinedCards: Card[]): Question[] => {
+export const loadQuestions = (nsfw: boolean, userCards: Card[], predefinedCards: Card[]): Question[] => {
     const nrQuestions = 5;
     let questionTexts: string[] = [];
 
