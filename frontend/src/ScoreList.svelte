@@ -1,56 +1,78 @@
 <script lang="ts">
-    import {twemoji} from 'svelte-twemoji';
-    import {Player} from './model/player';
+  import { PlayerState } from './model/player';
 
-    export let scores: Record<string, number> = {};
-    export let myUserId: string = ''; // user id
-    export let currentUserId: string = ''; // user id
-    export let players: Player[] = [];
+  export let playerStates: PlayerState[];
+  export let myUserId: string = '';
 
-    let scoreList: [string, string, number][];
+  let scores: [string, string, number][];
 
-    $: {
-        scoreList = players.map((p) => [p.id, p.name, scores[p.id] ?? 0])
-            .sort(([, , score1], [, , score2]) => score2 - score1);
-    }
+  $: {
+    scores = playerStates
+        ?.map((ps) => [ps.player.id, ps.player.name, ps.score])
+        .sort(([, , score1], [, , score2]) => score2 - score1)
+      || [];
+  }
 </script>
 
 <style>
-    .score-list {
-        text-decoration: none;
-        box-shadow: none;
-        text-shadow: none;
-        font-size: 17pt;
+	.player-first {
+		background-color: gold;
+	}
+
+    .player-first-shadow {
+		box-shadow: 0 0 25px 10px rgba(255, 215, 0, 0.4);
+    }
+
+	.player-second {
+		background-color: silver;
+	}
+
+    .player-second-shadow {
+		box-shadow: 0 0 25px 10px rgba(192, 192, 192, 0.4);}
+
+	.player-third {
+		background-color: chocolate;
+	}
+
+    .player-third-shadow {
+		box-shadow: 0 0 25px 10px rgba(210, 105, 30, 0.4);
     }
 </style>
 
-<main class="px-3">
-    <div id="scores">
-        <ul class="list-group score-list">
-            {#each scoreList as [id, name, score], index}
-                {#if index === 0}
-                    <li class="list-group-item d-flex justify-content-between align-items-center active">
-                        {#if id === myUserId}
-                            🥇 {name} (You)
-                        {:else}
-                            🥇 {name}
-                        {/if}
-                        <span class="badge bg-light text-dark rounded-pill" style="font-weight: bold">Score: {score}
-                            🌟</span>
-                    </li>
-                {:else}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {#if id === myUserId}
-                            🧒 {name} (You)
-                        {:else}
-                            🧒 {name}
-                        {/if}
-                        <span class="badge bg-secondary rounded-pill" style="font-weight: bold">Score: {score} 🌟</span>
-                    </li>
-                {/if}
-            {:else}
-                <li>No players?</li>
-            {/each}
-        </ul>
+<div class="justify-content-center">
+    <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+        {#each scores as [playerId, playerName, score], index}
+            <div class="col">
+                <div class="card text-center"
+                     class:player-first-shadow={index === 0}
+                     class:player-second-shadow={index === 1}
+                     class:player-third-shadow={index === 2}>
+                    <div class="card-header text-dark"
+                         class:player-first={index === 0}
+                         class:player-second={index === 1}
+                         class:player-third={index === 2}>
+                        <b>{index + 1}{#if index === 0}st{/if}{#if index === 1}nd{/if}{#if index === 2}rd{/if}{#if index > 2}th{/if}</b>
+                        with
+                        <b>{score}
+                            {#if score === 1}
+                                Point
+                            {:else}
+                                Points
+                            {/if}
+                        </b>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title"
+                            class:text-primary={myUserId === playerId}
+                            class:text-dark={myUserId !== playerId}>
+                            {playerName}
+                            {#if myUserId === playerId}
+                                (You)
+                            {/if}
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        {/each}
     </div>
-</main>
+</div>
