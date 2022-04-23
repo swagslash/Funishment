@@ -23,6 +23,7 @@
         {#if game}
             <GameBoard socket={socket}
                        game={game}
+                       isHost={userId === room.host.id}
                        userId={userId}
                        players={room?.players ?? []}/>
         {:else}

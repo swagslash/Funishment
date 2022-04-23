@@ -51,16 +51,11 @@
             clearInterval(interval);
         };
     });
-
-    function sendVotes(e: any) {
-        //TODO send votes
-        console.log(e.detail.id);
-    }
 </script>
 
 {#if finishedSlideshow}
     <div>
-        <VotingComponent currentPlayerId={currentPlayerId} cards="{playedCards}" on:votingComplete={sendVotes}></VotingComponent>
+        <VotingComponent currentPlayerId={currentPlayerId} cards="{playedCards}" on:voted></VotingComponent>
     </div>
 {:else}
     <div >

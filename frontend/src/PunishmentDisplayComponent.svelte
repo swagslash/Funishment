@@ -27,10 +27,10 @@
 
 {#if !finishedInterval}
     <div out:fade="{{ duration: animationDuration }}">
-        {#if !punishment}
+        {#if card}
             <h1>The Looming Punishment is</h1>
             <CardComponent card="{card}" showType showAuthor=""></CardComponent>
-        {:else}
+        {:else if punishment}
             <PunishmentComponent punishment="{punishment}"></PunishmentComponent>
         {/if}
 

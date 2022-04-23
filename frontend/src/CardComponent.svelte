@@ -68,26 +68,20 @@
         {/if}
         <div class="card-body">
             <h5 class="card-title text-dark" class:presenterTheme>{card.text}</h5>
-            {#if showAuthor}
-                <p class="card-text">
-                    <small class="text-muted">created by {card.author.name}</small>
-                </p>
-            {/if}
-            {#if showDealer && dealer}
-                <p class="card-text">
+            <p class="card-text">
+                {#if showAuthor}
+                    <small class="text-muted">created by {card.author?.name ?? 'SwagSlash'}</small>
+                {/if}
+                {#if showDealer && dealer}
                     <small class="text-muted">played by {dealer.name}</small>
-                </p>
-            {/if}
-            {#if votedFor}
-                <p class="card-text">
+                {/if}
+                {#if votedFor}
                     <small class="text-muted">You voted for this.</small>
-                </p>
-            {/if}
-            {#if played}
-                <p class="card-text">
-                    <small class="text-muted">You played this.</small>
-                </p>
-            {/if}
+                {/if}
+                {#if played}
+                    <small class="text-muted fw-bold">You played this.</small>
+                {/if}
+            </p>
         </div>
         {#if votable}
             <div class="card-footer text-muted">

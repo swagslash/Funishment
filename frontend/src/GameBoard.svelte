@@ -14,11 +14,10 @@
     import {Socket} from "socket.io-client";
     import QuestionComponent from "./QuestionComponent.svelte";
 
-    const dispatch = createEventDispatcher();
-
     export let socket: Socket;
     export let game: GameState;
     export let userId: string;
+    export let isHost: boolean;
     export let players: Player[];
 
     function getMyHand() {
@@ -49,6 +48,16 @@
         socket.emit('selectCard', e.detail.id)
         console.log("Emit selectCard to server " + e.detail.id)
     }
+
+    function sendNextRound(e: any) {
+        socket.emit('startNextRound')
+        console.log("Emit startNextRound to server")
+    }
+
+    function sendVotes(e: any) {
+        socket.emit('voteCard', e.detail.id)
+        console.log("Emit voteCard to server " + e.detail.id)
+    }
 </script>
 
 <main class="px-3">
@@ -67,17 +76,21 @@
             <QuestionComponent question={game.question}></QuestionComponent>
             <HandCards canPlay={true} cards={getMyHand()} on:play={sendPlayedCard}></HandCards>
         {:else if game.phase === GamePhase.CardVoting}
-            <CardPresenter currentPlayerId={userId} playedCards={game.playedCards}></CardPresenter>
-            <HandCards canPlay={false} cards={getMyHand()}></HandCards>
+            <QuestionComponent question={game.question}></QuestionComponent>
+            <CardPresenter currentPlayerId={userId} playedCards={game.playedCards} on:voted={sendVotes}></CardPresenter>
         {:else if game.phase === GamePhase.CardResults}
-            <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
+            <QuestionComponent question={game.question}></QuestionComponent>
             <VotingResultComponent currentPlayerId={userId} playedCards={game.playedCards}></VotingResultComponent>
-            <ScoreList scores={game.playerState}></ScoreList>
-            <!-- TODO add continue button for host -->
+
+            <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
+
+            {#if isHost}
+                <button class="btn btn-primary" on:click={sendNextRound}>Next round</button>
+            {/if}
         {:else if game.phase === GamePhase.Scoreboard}
             <!-- endgame -->
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
-            <ScoreList scores={game.playerState}></ScoreList>
+            <ScoreList playerStates={game.playerState}></ScoreList>
             <!-- TODO scores needs to take playerState -->
         {:else}
             <h1>Missing implementation for view of {game.phase}</h1>
