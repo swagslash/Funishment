@@ -24,6 +24,7 @@
 
   function onVote() {
     console.log("voted for " + card.id);
+    votedFor = true;
     dispatch("voted", { id: card.id });
   }
 </script>
