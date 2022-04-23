@@ -17,4 +17,16 @@ export interface InternalState {
   gameState: GameState;
   votedPunishment?: Card;
   hiddenPunishment?: Card;
+  /**
+   * Only user generated cards.
+   * Used for
+   * * player's hand
+   * * question placeholder
+   */
+  cardPool: Card[];
+
+  /**
+   * All played cards (id) which cannot be reused.
+   */
+  playedCardIds: number[];
 }

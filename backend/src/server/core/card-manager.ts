@@ -11,7 +11,7 @@ const CARD_MANAGER_LOG_PREFIX = 'log-manager';
  * @param player
  * @param state
  */
-export const assignCardMetadata = (card: Card, player: Player, state: InternalState): void => {
+export const assignCardMetadata = (card: Card, player: Player | undefined, state: InternalState): void => {
   state.nextCardId++;
 
   card.id = state.nextCardId;
@@ -65,4 +65,67 @@ export const getTopMostCards = ({gameState: {playedCards}}: InternalState): [Car
   const sorted = playedCards.sort((a, b) => a.votes - b.votes);
 
   return [sorted[0].card, sorted[1].card];
+};
+
+export const createNewPlayerCard = (text: string, type: CardType): Card => {
+  return {
+    id: -1,
+    text,
+    type,
+  };
+};
+
+export const generatePlayerCards = (state: InternalState): Card[] => {
+  return state.gameState.playerState.map(({player}) => {
+    const card: Card = {
+      id: -1,
+      text: player.name,
+      type: CardType.Player,
+    }
+
+    assignCardMetadata(card, undefined, state);
+
+    return card;
+  });
+}
+
+/**
+ * Initial card hand-out for all players
+ */
+export const handoutCards = ({cardPool, playedCardIds, gameState}: InternalState): void => {
+
+
+  for (const {hand} of gameState.playerState) {
+    for (let i = 0; i < 2; i++) {
+      const newCards = cardPool.filter((card) => !playedCardIds.includes(card.id));
+
+      const personCard = newCards.find((card) => card.type === CardType.Person);
+      hand.push(personCard);
+      playedCardIds.push(personCard.id);
+
+      const playerCard = newCards.find((card) => card.type === CardType.Player);
+      hand.push(playerCard);
+      playedCardIds.push(playerCard.id);
+
+      const objectCard = newCards.find((card) => card.type === CardType.Object);
+      hand.push(objectCard);
+      playedCardIds.push(objectCard.id);
+
+      const placeCard = newCards.find((card) => card.type === CardType.Place);
+      hand.push(placeCard);
+      playedCardIds.push(placeCard.id);
+
+      const activityCard = newCards.find((card) => card.type === CardType.Activity);
+      hand.push(activityCard);
+      playedCardIds.push(activityCard.id);
+    }
+  }
+};
+
+/**
+ * Refill the players hand with pre-defined cards
+ * @param state
+ */
+export const refillHand = (state: InternalState): void => {
+
 };
