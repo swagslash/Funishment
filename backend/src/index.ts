@@ -9,8 +9,10 @@ import { Room } from './model/room';
 import {
   addCard,
   assignCardMetadata,
-  createNewPunishmentCard,
-  getCardVotingScore, getTopMostCards,
+  createNewPlayerCard,
+  createNewPunishmentCard, generatePlayerCards,
+  getCardVotingScore,
+  getTopMostCards, handoutCards, refillHand,
   voteForCard,
 } from './server/core/card-manager';
 import { createInternalState, removeInternalState } from './server/core/game-manager';
@@ -136,18 +138,23 @@ io.on('connection', (socket) => {
       return;
     }
 
+    if (internalState.gameState.phase !== GamePhase.PunishmentCreation) {
+      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.PunishmentCreation);
+      return;
+    }
+
     const card = createNewPunishmentCard(punishmentText);
     assignCardMetadata(card, player, internalState);
     addCard(card, player, internalState);
 
-    // Check if all players created punishments
+    // All players created punishments => proceed to next phase
     if (internalState.gameState.playedCards.length === room.players.length) {
       internalState.gameState.phase = GamePhase.PunishmentVoting;
-
-      socket.emit('update', internalState.gameState);
-      socket.to(room.id)
-        .emit('update', internalState.gameState);
     }
+
+    socket.emit('update', internalState.gameState);
+    socket.to(room.id)
+      .emit('update', internalState.gameState);
   });
 
   socket.on('votePunishment', (punishmentId: number) => {
@@ -155,19 +162,63 @@ io.on('connection', (socket) => {
       return;
     }
 
+    if (internalState.gameState.phase !== GamePhase.PunishmentVoting) {
+      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.PunishmentCreation);
+      return;
+    }
+
     voteForCard(punishmentId, internalState);
 
-    // All players finished voting
+    // All players finished voting => set punishments and proceed to next phase
     if (getCardVotingScore(internalState) === room.players.length) {
       internalState.gameState.phase = GamePhase.CardCreation;
       const [voted, hidden] = getTopMostCards(internalState);
       internalState.votedPunishment = voted;
       internalState.hiddenPunishment = hidden;
+
+      // Reste played cards for the next phase
+      internalState.gameState.playedCards = [];
     }
+
+    socket.emit('update', internalState.gameState);
+    socket.to(room.id)
+      .emit('update', internalState.gameState);
   });
 
   socket.on('createCards', (cards: {type: CardType; text: string}[]) => {
+    if (!player || !room || !internalState) {
+      return;
+    }
 
+    if (internalState.gameState.phase !== GamePhase.CardCreation) {
+      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.PunishmentCreation);
+      return;
+    }
+
+    for (const {type, text} of cards) {
+      const card = createNewPlayerCard(text, type);
+      assignCardMetadata(card, player, internalState);
+
+      internalState.cardPool.push(card);
+    }
+
+    // All players created cards => proceed to card placement
+    if (internalState.cardPool.length === room.players.length * 8) {
+      internalState.gameState.phase = GamePhase.CardPlacement;
+
+      const playerCards = generatePlayerCards(internalState);
+      internalState.cardPool.push(...playerCards);
+
+      // Handout cards + refill
+      handoutCards(internalState);
+      refillHand(internalState);
+
+      // Set first question
+    }
+
+    socket.emit('update', internalState.gameState);
+    socket.to(room.id)
+      .emit('update', internalState.gameState);
   });
 
   socket.on('selectCard', (cardId: number) => {
@@ -182,7 +233,7 @@ io.on('connection', (socket) => {
 
   });
 
-  socket.on('selectBoxes', (boxes) => {
+  // socket.on('selectBoxes', (boxes) => {
     // if (!room || !player) {
     //   return;
     // }
@@ -204,9 +255,9 @@ io.on('connection', (socket) => {
     //     .emit('guessBoxes', room.game);
     //   socket.emit('guessBoxes', room.game);
     // }
-  });
+  // });
 
-  socket.on('guessBoxes', (guess) => {
+  // socket.on('guessBoxes', (guess) => {
     // if (!room || !player) {
     //   return;
     // }
@@ -228,7 +279,7 @@ io.on('connection', (socket) => {
     //     console.log('[GAME][GUESS MISSING]', room.id, maxGuesses - alreadyGuessed);
     //   }
     // }
-  });
+  // });
 
   socket.on('disconnect', () => {
     // console.log('[DISCONNECT]', socket.id);

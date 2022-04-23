@@ -42,8 +42,9 @@ export const createInternalState = (room: Room) => {
   const state: InternalState = {
     roomId: room.id,
     nextCardId: 0,
-    punishments: [],
     gameState,
+    cardPool: [],
+    playedCardIds: [],
   };
 
   npmlog.log(GAME_MANAGER_LOG_PREFIX, 'Create new internal state for room %s', room.id);
