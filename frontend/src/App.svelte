@@ -20,10 +20,7 @@
         {/if}
 
         {#if game}
-            <GameBoard on:boxesSelected={hostSelectBoxes}
-                       on:boxesGuessed={playerGuessBox}
-                       on:continueNextRound={hostStartGame}
-                       game={game}
+            <GameBoard game={game}
                        userId={userId}
                        players={room?.players ?? []}/>
         {:else}
@@ -146,7 +143,7 @@
     let roomNotFound: boolean = false;
     let startGameDisabled: boolean = false;
 
-    const kitchenSinkEnabled = true; // TODO set to false to game to work, ONLY USED FOR DEBGUGING COMPONENTS
+    const kitchenSinkEnabled = false; // TODO set to false to game to work, ONLY USED FOR DEBGUGING COMPONENTS
 
     // const socket = io('http://164.90.213.85:3000/');
     const socket = io('http://localhost:3000');
@@ -190,29 +187,18 @@
         game = undefined;
     });
 
-    socket.on('roomCreated', (_room) => {
+    socket.on('roomCreated', (_room: Room) => {
         updateRoom(_room);
         roomNotFound = false;
     });
 
-    socket.on('roomJoined', (_room) => {
+    socket.on('roomUpdated', (_room: Room) => {
         updateRoom(_room);
         roomNotFound = false;
     });
 
-    socket.on('updatePlayers', (_room) => {
-        updateRoom(_room);
-    });
-
-    socket.on('gameStarted', (_game) => {
-        game = _game;
-    });
-
-    socket.on('guessBoxes', (_game) => {
-        game = _game;
-    });
-
-    socket.on('reportScores', (_game) => {
+    socket.on('update', (_game: GameState) => {
+        console.log("update received")
         game = _game;
     });
 
