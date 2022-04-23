@@ -202,7 +202,7 @@ io.on('connection', (socket) => {
 
       npmlog.info(PUNISHMENT_LOG_PREFIX, 'Voted punishment %s %s, hidden punishment: %s %s', voted.id, voted.text, hidden.id, hidden.text);
 
-      // Reste played cards for the next phase
+      // Reset played cards for the next phase
       internalState.gameState.playedCards = [];
 
     }
@@ -233,11 +233,12 @@ io.on('connection', (socket) => {
     if (internalState.cardPool.length === room.players.length * CARDS_PER_CATEGORY * CATEGORY_COUNT) {
       npmlog.info(CARDS_LOG_PREFIX, 'All players in room %s created cards', room.id);
       const playerCards = generatePlayerCards(internalState);
-      internalState.cardPool.push(...playerCards);
 
       // Load predefined cards and questions
-      internalState.predefinedCards = loadCardsForAllTypes(room.nsfw);
-      internalState.questions = loadQuestions(room.nsfw, null, null);
+      internalState.predefinedCards = loadCardsForAllTypes(room.nsfw, room.players.map((p) => p.name));
+      internalState.questions = loadQuestions(room.nsfw, internalState.cardPool, playerCards, internalState.predefinedCards);
+
+      internalState.cardPool.push(...playerCards);
 
       handoutCards(internalState);
 
@@ -403,7 +404,8 @@ io.on('connection', (socket) => {
 
     // Set next question
     // TODO: @Alex
-    internalState.gameState.question = { text: 'Question from server' };
+
+    internalState.gameState.question = internalState.questions.pop();
 
     // Reset played cards
     internalState.gameState.playedCards = [];
