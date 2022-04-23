@@ -15,6 +15,7 @@ import {
   getTopMostCards, handoutCards, refillHand,
   voteForCard,
 } from './server/core/card-manager';
+import { loadCardsForAllTypes, loadQuestions } from './server/core/file-manager';
 import { createInternalState, removeInternalState } from './server/core/game-manager';
 import { createOrGetPlayer, createRoom, getRoom, joinRoom, leaveRoom } from './server/core/room-manager';
 import { InternalState } from './server/core/state';
@@ -22,6 +23,9 @@ import { ClientToServerEvents, ServerToClientEvents, ServerToServerEvents } from
 
 const SERVER_PORT = +(process.env.SERVER_PORT ?? 3_000);
 const SERVER_LOG_PREFIX = 'server';
+
+const CATEGORY_COUNT = 4;
+const CARDS_PER_CATEGORY = 2;
 
 const app = express();
 const server = http.createServer(app);
@@ -199,15 +203,21 @@ io.on('connection', (socket) => {
       const card = createNewPlayerCard(text, type);
       assignCardMetadata(card, player, internalState);
 
-      internalState.cardPool.push(card);
+      const jfasl = internalState.cardPool.get(card.type) || [];
+      jfasl.push(card);
+      internalState.cardPool.set(card.type, jfasl);
     }
 
     // All players created cards => proceed to card placement
-    if (internalState.cardPool.length === room.players.length * 8) {
+    if (internalState.cardPool.size === room.players.length * CARDS_PER_CATEGORY * CATEGORY_COUNT) {
       internalState.gameState.phase = GamePhase.CardPlacement;
 
       const playerCards = generatePlayerCards(internalState);
-      internalState.cardPool.push(...playerCards);
+      internalState.cardPool.set(CardType.Player, playerCards);
+
+      // Load predefined cards and questions
+      internalState.predefinedCards = loadCardsForAllTypes(room.nsfw);
+      internalState.questions = loadQuestions(room.nsfw, null, null);
 
       // Handout cards + refill
       handoutCards(internalState);

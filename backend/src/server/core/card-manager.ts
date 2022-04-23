@@ -97,9 +97,7 @@ export const handoutCards = ({cardPool, playedCardIds, gameState}: InternalState
 
   for (const {hand} of gameState.playerState) {
     for (let i = 0; i < 2; i++) {
-      const newCards = cardPool.filter((card) => !playedCardIds.includes(card.id));
-
-      const personCard = newCards.find((card) => card.type === CardType.Person);
+      const personCard = cardPool.get(CardType.Person).filter((card) => !playedCardIds.includes(card.id));
       hand.push(personCard);
       playedCardIds.push(personCard.id);
 
