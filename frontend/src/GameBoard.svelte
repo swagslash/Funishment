@@ -27,7 +27,7 @@
             <h1>PunishmentVoting</h1>
             <VotingComponent cards={game.playedCards.map((pc) => pc.card)}></VotingComponent>
         {:else if game.phase === GamePhase.CardCreation}
-            <PunishmentDisplayComponent punishment={}></PunishmentDisplayComponent>
+            <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
             <CardCreatorComponent></CardCreatorComponent>
         {:else if game.phase === GamePhase.CardPlacement}
             <!-- TODO implement hand with cards (game.playerState find with id) -->
