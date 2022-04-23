@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as npmlog from 'npmlog';
 import {Card, CardType} from "../../model/card";
 import {Question} from "../../model/question";
 
@@ -12,7 +13,7 @@ const PROB_USER_CARD_FILLS_QUESTION = .8;
  */
 export const loadLinesFromDisk = (txtPath: string) => {
     let data = fs.readFileSync(txtPath).toString('utf-8');
-    return data.split("\r\n");
+    return data.split("\n").map((line) => line.replace('\r', ''));
 };
 
 /**
@@ -157,7 +158,7 @@ export const parseQuestionText = (questionText: string, userCards: Card[], prede
         const placeholder = placeholders[i][0];
         let replacement = replacementCards[i].text;
 
-        questionText = questionText.replace(placeholder, replacement)
+        questionText = questionText.replace(placeholder, replacement);
     }
 
     return questionText;
@@ -193,14 +194,14 @@ export const loadQuestions = (nsfw: boolean, userCards: Card[], predefinedCards:
 
     return questions;
 };
-
-
-const cardsss = loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]);
-nextId = 0;
-
-
-console.log(
-    loadQuestions(false,
-        loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]),
-        cardsss)
-);
+//
+//
+// const cardsss = loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]);
+// nextId = 0;
+//
+//
+// console.log(
+//     loadQuestions(false,
+//         loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]),
+//         cardsss)
+// );
