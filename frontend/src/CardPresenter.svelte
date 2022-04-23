@@ -1,6 +1,6 @@
 <script lang="ts">
     import CardComponent from "./CardComponent.svelte";
-    import {Card, CardType} from "src/model/card";
+    import {Card} from "src/model/card";
     import {onMount} from "svelte";
     import {fade, fly} from 'svelte/transition';
 

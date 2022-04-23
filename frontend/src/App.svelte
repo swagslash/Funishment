@@ -14,6 +14,11 @@
                 </nav>
             </div>
         </header>
+
+        <QuestionComponent question="{exampleQuestion}"></QuestionComponent>
+        <VotingComponent cards="{exampleCards}" question="{exampleQuestion}" on:votingComplete={handleVoting}></VotingComponent>
+
+
         {#if kitchenSinkEnabled}
             <KitchenSink></KitchenSink>
         {/if}
@@ -129,12 +134,62 @@
     import GameBoard from "./GameBoard.svelte";
     import {GameState} from './model/game-state';
     import {Room} from './model/room';
+    import {Card, CardType} from './model/card';
+    import {Question} from './model/question';
+    import EditableCardComponent from "src/EditableCardComponent.svelte";
+    import {CardType} from "src/model/card";
+    import {Player} from "src/model/player";
+    import VotingComponent from "src/VotingComponent.svelte";
     import KitchenSink from "./KitchenSink.svelte";
 
     let game: GameState;
     let userId: string;
     let username: string;
     let room: Room;
+
+    let examplePlayer: Player = {id: '1', name: 'W8D7'};
+    let exampleCard: Card = {
+        type: CardType.Object,
+        id: 1,
+        text: 'A huge bage of dirty skittles boys',
+        author: examplePlayer
+    };
+
+    let exampleCardPerson: Card = {
+        type: CardType.Person,
+        id: 2,
+        text: 'Donald Trump',
+        author: examplePlayer
+    };
+
+    let exampleCardPlace: Card = {
+        type: CardType.Place,
+        id: 3,
+        text: 'Your Home',
+        author: null
+    };
+
+    let exampleCardActivity: Card = {
+        type: CardType.Activity,
+        id: 4,
+        text: 'Jerking off',
+        author: examplePlayer
+    };
+    let exampleCardActivity2: Card = {
+        type: CardType.Activity,
+        id: 4,
+        text: 'slapping Andi with a Wet Towel',
+        author: examplePlayer
+    };
+    let exampleQuestion: Question = {text: "How fat is Andi's aunt?"}
+
+    let exampleCards = [];
+    exampleCards.push(exampleCardActivity);
+    exampleCards.push(exampleCardPlace);
+    exampleCards.push(exampleCardPerson);
+    exampleCards.push(exampleCard);
+    exampleCards.push(exampleCardActivity2);
+
 
     let roomNotFound: boolean = false;
     let startGameDisabled: boolean = false;
@@ -218,5 +273,9 @@
 
     function nextRound() {
         hostStartGame();
+    }
+
+    function handleVoting(e:any) {
+        console.log(e.detail.id);
     }
 </script>
