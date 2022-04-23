@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { Card } from "./model/card";
+  import {Card, CardType} from "./model/card";
 
   const dispatch = createEventDispatcher();
 
@@ -9,10 +9,18 @@
 
   export let playable = false;
   export let showAuthor = false;
+  export let showType = false;
   export let votable = false;
   export let votedFor = false;
   export let isWinner = false;
   export let score: number | undefined = undefined;
+
+  const typeToStringMap = new Map<CardType, string>([
+    [CardType.Object, "Object"],
+    [CardType.Activity, "Activity"],
+    [CardType.Person, "Person"],
+    [CardType.Place, "Place"],
+  ]);
 
   function onVote() {
     console.log("voted for " + card.id);
@@ -30,6 +38,15 @@
       >
         {#if isWinner}⭐{/if}
         {score} Votes {#if isWinner}⭐{/if}
+      </div>
+    {:else if showType}
+      <div class="card-header"
+           class:object={card.type === CardType.Object}
+           class:person={card.type === CardType.Person}
+           class:place={card.type === CardType.Place}
+           class:activity={card.type === CardType.Activity}
+      >
+        {typeToStringMap.get(card.type)}
       </div>
     {/if}
     <div class="card-body">
@@ -49,7 +66,7 @@
   </div>
 </div>
 
-<style>
+<style lang="scss">
   .card {
     position: relative;
     top: 0;
@@ -81,5 +98,25 @@
     color: rgba(255, 255, 255, 1);
     box-shadow: 0 5px 5px rgba(238, 206, 24, 0.4);
     top: -10px;
+  }
+
+  .object {
+    background-color: #6610f2;
+    color: white;
+  }
+
+  .person {
+    background-color: #fd7e14;
+    color: black;
+  }
+
+  .place {
+    background-color: #198754;
+    color: white;
+  }
+
+  .activity {
+    background-color: #0dcaf0;
+    color: white;
   }
 </style>
