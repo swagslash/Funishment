@@ -33,7 +33,7 @@
             <input type="text" class="form-control" bind:value={lobbyId} id="lobbyField"
                    placeholder="Lobby id (leave blank to create)">
         </div>
-        <div class="form-group">
+        <div class="form-group" hidden={lobbyId}>
             <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
             <label class="form-check-label" for="flexCheckChecked">
                 Enable NSFW content 🥵🍆
