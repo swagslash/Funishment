@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {createEventDispatcher} from 'svelte';
+    import { createEventDispatcher } from 'svelte';
 
     export let lobbyId: string;
     export let username: string;
@@ -18,7 +18,7 @@
     }
 </script>
 
-<main class="px-3">
+<main class="px-3" style="max-width: 37em; margin: auto">
     <div id="pre-lobby">
         <h1>Play now!</h1>
         <p class="lead">To start playing, either create a room or join one via ID!</p>
@@ -32,12 +32,17 @@
             <label for="lobbyField">Lobby ID</label>
             <input type="text" class="form-control" bind:value={lobbyId} id="lobbyField"
                    placeholder="Lobby id (leave blank to create)">
-
-            {#if roomNotFound}
-                <br>
-                <p class="bg-danger badge" style="padding: 10px">Room not found</p>
-            {/if}
         </div>
+        <div class="form-group">
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+            <label class="form-check-label" for="flexCheckChecked">
+                Enable NSFW content 🥵🍆
+            </label>
+        </div>
+        {#if roomNotFound}
+            <br>
+            <p class="bg-danger badge" style="padding: 10px">Room not found</p>
+        {/if}
 
         <br/>
 
@@ -51,9 +56,9 @@
 
 
 <style>
-    /*
-   * Globals
-   */
+    .form-group {
+        margin-bottom: 10px;
+    }
 
 
     /* Custom default button */

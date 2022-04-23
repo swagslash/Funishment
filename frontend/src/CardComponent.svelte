@@ -1,0 +1,72 @@
+<script lang="ts">
+  import { createEventDispatcher } from "svelte";
+  import { Card } from "./model/card";
+
+  const dispatch = createEventDispatcher();
+
+  export let text: string;
+  export let card: Card;
+
+  export let playable = false;
+  export let showAuthor = false;
+  export let votable = false;
+  export let isWinner = false;
+  export let score: number | undefined = undefined;
+
+  function onVote() {
+    console.log("voted for " + card.id);
+    dispatch("voted", { id: card.id });
+  }
+</script>
+
+<div class="col">
+  <div class="card text-center" class:playable>
+    {#if score}
+      <div
+        class="card-header text-white"
+        class:bg-warning={isWinner}
+        class:bg-secondary={!isWinner}
+      >
+        {#if isWinner}⭐{/if}
+        {score} Votes {#if isWinner}⭐{/if}
+      </div>
+    {/if}
+    <div class="card-body">
+      <h5 class="card-title text-dark">{card.text}</h5>
+      {#if showAuthor}<p class="card-text">
+          <small class="text-muted">by {card.author}</small>
+        </p>{/if}
+    </div>
+    {#if votable}
+      <div class="card-footer text-muted">
+        <a href="#" on:click={onVote} class="card-link">🔥 Vote</a>
+      </div>
+    {/if}
+  </div>
+</div>
+
+<style>
+  .card {
+    position: relative;
+    top: 0;
+    transition: top ease 0.5s;
+    margin: 5px;
+
+    /* width: 14rem; */
+  }
+
+  .card-title {
+    font-family: Neucha, -apple-system, system-ui, BlinkMacSystemFont,
+      "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .playable {
+    cursor: pointer;
+  }
+
+  .playable:hover {
+    color: rgba(255, 255, 255, 1);
+    box-shadow: 0 5px 5px rgba(238, 206, 24, 0.4);
+    top: -10px;
+  }
+</style>

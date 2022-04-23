@@ -1,5 +1,5 @@
-<div class="d-flex h-100 text-center text-white bg-dark">
-    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+<div class="d-flex text-center text-white">
+    <div class="cover-container d-flex w-100 h-100 p-1 mx-auto flex-column">
         <header class="mb-auto">
             <div>
                 <h3 class="float-md-start mb-0">⚖️ Funishment</h3>
@@ -14,6 +14,23 @@
                 </nav>
             </div>
         </header>
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">
+                    <CardComponent text="Your momma" score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" isWinner score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" playable score="{5}" card="{exampleCard}"></CardComponent>
+        </div>
+
+        
+
 
         {#if game}
             <GameBoard on:boxesSelected={hostSelectBoxes}
@@ -40,7 +57,9 @@
                     {/if}
                 </div>
             {:else}
+            <div class="justify-content-center">
                 <LoginForm roomNotFound="{roomNotFound}" on:join={join}/>
+            </div>
             {/if}
         {/if}
 
@@ -57,6 +76,9 @@
   /*
  * Globals
  */
+ .cover-container {
+	max-width: 67em;
+}
 
 
   /* Custom default button */
@@ -115,15 +137,20 @@
 
     import PlayerList from './PlayerList.svelte';
     import LoginForm from './LoginForm.svelte';
+    import CardComponent from './CardComponent.svelte';
 
     import GameBoard from "./GameBoard.svelte";
-    import {Game} from './model/game';
+    import {GameState} from './model/game-state';
     import {Room} from './model/room';
+    import {Card} from './model/card';
+import { text } from "svelte/internal";
 
-    let game: Game;
+    let game: GameState;
     let userId: string;
     let username: string;
     let room: Room;
+
+    let exampleCard: Card = { id: 1, text: 'A huge bage of dirty skittles boys', author: { id: 1, name: 'W8D7' }}
 
     let roomNotFound: boolean = false;
     let startGameDisabled: boolean = false;
@@ -154,14 +181,6 @@
     function hostStartGame() {
         // start the game here
         socket.emit('startGame');
-    }
-
-    function hostSelectBoxes(event) {
-        socket.emit('selectBoxes', event.detail);
-    }
-
-    function playerGuessBox(event) {
-        socket.emit('guessBoxes', event.detail);
     }
 
     function updateRoom(_room) {
