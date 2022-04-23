@@ -1,6 +1,6 @@
 import npmlog from 'npmlog';
 import { GamePhase, GameState } from '../../model/game-state';
-import { PlayerState } from '../../model/player';
+import { Player, PlayerState } from '../../model/player';
 import { Room } from '../../model/room';
 import { InternalState, internalState } from './state';
 
@@ -44,12 +44,45 @@ export const createInternalState = (room: Room) => {
     nextCardId: 0,
     gameState,
     cardPool: [],
-    playedCardIds: [],
+    predefinedCards: [],
+    questions: [],
   };
 
   npmlog.log(GAME_MANAGER_LOG_PREFIX, 'Create new internal state for room %s', room.id);
 
   return state;
+};
+
+export const calculateScores = ({gameState}: InternalState): void => {
+  const highscore = gameState.playedCards.reduce(
+    (max, current) => current.votes > max ? current.votes : max,
+    0,
+  );
+
+  const winningCards = gameState.playedCards.filter((card) => card.votes === highscore);
+
+  if (winningCards.length === 1) {
+    // WIN
+    const card = winningCards[0];
+    const author = card.card.author;
+    const dealer = card.dealer;
+    updateScore(author, 1, gameState);
+    updateScore(dealer, 3, gameState);
+  } else {
+    // TIE
+    for (const winningCard of winningCards) {
+      updateScore(winningCard.dealer, 2, gameState);
+    }
+  }
+};
+
+const updateScore = (player: Player | undefined, score: number, state: GameState): void => {
+  if (player === undefined) {
+    return;
+  }
+
+  const playerState = state.playerState.find((playerState) => playerState.player.id === player.id);
+  playerState.score += score;
 };
 
 

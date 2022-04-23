@@ -4,6 +4,7 @@ import { Player } from '../../model/player';
 import { InternalState } from './state';
 
 const CARD_MANAGER_LOG_PREFIX = 'log-manager';
+const MAX_PLAYER_CARDS = 12;
 
 /**
  * Assign card metadata: card id and author
@@ -89,33 +90,33 @@ export const generatePlayerCards = (state: InternalState): Card[] => {
   });
 }
 
+const getNewCard = (type: CardType, playedCards: number[], cardPool: Card[]): Card => {
+  const newCards = cardPool
+    .filter((card) => card.type === type)
+    .filter((card) => !playedCards.includes(card.id));
+  const index = Math.floor(Math.random() * newCards.length);
+
+  const newCard = newCards.splice(index, 1)[0];
+
+  playedCards.push(newCard.id);
+
+  return newCard;
+};
+
 /**
  * Initial card hand-out for all players
  */
-export const handoutCards = ({cardPool, playedCardIds, gameState}: InternalState): void => {
-
+export const handoutCards = ({cardPool, gameState}: InternalState): void => {
+  const playedCardIds: number[] = [];
 
   for (const {hand} of gameState.playerState) {
+    hand.push(getNewCard(CardType.Player, playedCardIds, cardPool));
+
     for (let i = 0; i < 2; i++) {
-      const personCard = cardPool.get(CardType.Person).filter((card) => !playedCardIds.includes(card.id));
-      hand.push(personCard);
-      playedCardIds.push(personCard.id);
-
-      const playerCard = newCards.find((card) => card.type === CardType.Player);
-      hand.push(playerCard);
-      playedCardIds.push(playerCard.id);
-
-      const objectCard = newCards.find((card) => card.type === CardType.Object);
-      hand.push(objectCard);
-      playedCardIds.push(objectCard.id);
-
-      const placeCard = newCards.find((card) => card.type === CardType.Place);
-      hand.push(placeCard);
-      playedCardIds.push(placeCard.id);
-
-      const activityCard = newCards.find((card) => card.type === CardType.Activity);
-      hand.push(activityCard);
-      playedCardIds.push(activityCard.id);
+      hand.push(getNewCard(CardType.Person, playedCardIds, cardPool));
+      hand.push(getNewCard(CardType.Object, playedCardIds, cardPool));
+      hand.push(getNewCard(CardType.Place, playedCardIds, cardPool));
+      hand.push(getNewCard(CardType.Activity, playedCardIds, cardPool));
     }
   }
 };
@@ -125,5 +126,31 @@ export const handoutCards = ({cardPool, playedCardIds, gameState}: InternalState
  * @param state
  */
 export const refillHand = (state: InternalState): void => {
+  const {predefinedCards, gameState} = state;
+  const {playerState} = gameState;
 
+  for (const {player, hand} of playerState) {
+    while (hand.length < MAX_PLAYER_CARDS) {
+      const index = Math.floor(Math.random() * predefinedCards.length);
+      const newCard = predefinedCards.splice(index, 1)[0];
+
+      assignCardMetadata(newCard, player, state);
+
+      hand.push(newCard);
+    }
+  }
 };
+
+export const removeCardFromHand = (cardId: number, {gameState}: InternalState): Card | undefined => {
+  for (const {hand} of gameState.playerState) {
+    const index = hand.findIndex((card) => card.id === cardId);
+
+    if (index > -1) {
+      return hand.splice(index, 1)[0];
+    }
+  }
+
+  npmlog.warn(CARD_MANAGER_LOG_PREFIX, 'Card with id %s not found', cardId);
+
+  return undefined;
+}

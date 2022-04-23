@@ -71,15 +71,18 @@ export const loadQuestions = (nsfw: boolean, userCards: Map<CardType, Card[]>, p
     // });
 };
 
-export const loadCardsForAllTypes = (nsfw: boolean): Map<CardType, Card[]> => {
+export const loadCardsForAllTypes = (nsfw: boolean): Card[] => {
   const cards = new Map<CardType, Card[]>();
   cards.set(CardType.Activity, loadCardsForType('Activities', CardType.Activity, nsfw));
   cards.set(CardType.Object, loadCardsForType('Objects', CardType.Object, nsfw));
   cards.set(CardType.Person, loadCardsForType('Persons', CardType.Person, nsfw));
   cards.set(CardType.Place, loadCardsForType('Places', CardType.Place, nsfw));
 
-  return cards;
+  // return cards;
+
+  return [];
 };
+
 //
 //
 //
