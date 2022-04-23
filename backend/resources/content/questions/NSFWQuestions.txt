@@ -5,6 +5,7 @@ Who killed {Player|Person}?
 How is {Player|Person} going to get killed?
 Where will {Player|Person} die?
 Who got killed by {Object}?
+Who got killed {Place}?
 Why is {Player|Person} afraid at night?
 What's {Player|Person}'s favourite drug?
 Where does {Player|Person} like to get off?
@@ -18,3 +19,6 @@ Where do you hide your drugs?
 Where would you hide a corpse (asking for a friend)?
 How to seduce {Person} (asking for a friend)?
 How to seduce {Player}?
+Where does {Player} end up after a night out drinking?
+What is licking on your balls?
+What is Hitler's biggest fear?

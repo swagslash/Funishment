@@ -1,37 +1,21 @@
-London
-The Pub
-At Home
-The Discotheque
-In a Tree
-Paris
-In a car
-In Space
-At Unitversity
-127.0.0.1
-localhost
-The marshmellow factory
-In the ocean
-Nowhere
-It doesn't matter
-At the toilet
-At the public toilet
-At Subway(tm)
-Japan
-Hawaii
-Mount Everest
-In a hidden basement
-Area 51
-In the hollow earth
-Uranus
-Mars
-Venus
-The Moon
-The Deathstar
-{Player}'s home
-{Player}'s bedroom
-{Player}'s school
-{Player}'s kitchen
-{Player}'s bathroom
-{Player}'s workplace
-At work
-Right here
+in London
+at the pub
+at home
+at the disco
+in a tree
+in Paris
+in a car
+at the university
+@ 127.0.0.1
+nowhere
+on the public toilet
+at Subway®
+in a hidden basement
+in Area 51
+in the hollow earth
+in Uranus
+in the {Player}'s home
+in the {Player}'s bedroom
+in the {Player}'s bathroom
+in the favelas of Rio de Janeiro
+on the most suspicious toilet

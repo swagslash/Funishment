@@ -1,18 +1,22 @@
 {Player}'s car
-A banana
-Two pints of lager
-A pan
+a banana
+two pints of lager
+a pan
 {Player}'s phone
-An apple
+an apple
 {Player}'s glasses
 {Player}'s hidden journal
 {Player}'s pants
-pants
+jogging pants
 {Player}'s clothes
 {Player}'s underwear
-An egg
-A chicken
-A dog
+an egg
+a chicken
+a dog
 world piece
-A Trashcan
-Cancer
+a trashcan
+cancer
+expired milk
+[object Object]
+□
+Chicken McNuggets®
