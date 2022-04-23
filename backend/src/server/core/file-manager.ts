@@ -42,6 +42,8 @@ export const parseCardText = (cardText: string, playerNames: string[]): string =
  * Loads all cards for the cardType from disk. Also considers the nsfw flag.
  * @param cardTypeString cardType as called by the files
  * @param cardType
+ * @param nsfw
+ * @param playerNames
  */
 export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsfw: boolean, playerNames: string[]): Card[] => {
     let cardTexts: string[] = [];
@@ -107,7 +109,8 @@ export const getCardForTypePlaceholder = (typePlaceholderOptions: string[], card
         typeOptions.push(CardType.Activity);
     }
     if (typePlaceholderOptions.length == 1 && typePlaceholderOptions[0] === "_") {
-        console.error("fix");
+        console.error("Encountered not allowed placeholder '_'");
+        typeOptions = [];
     }
 
     return cards
@@ -117,7 +120,7 @@ export const getCardForTypePlaceholder = (typePlaceholderOptions: string[], card
         .filter(fc => usedCards.length == 0 || !usedCards.map(uc => uc.id).includes(fc.id))
         // shuffle
         .sort(() => 0.5 - Math.random())
-        // first or null
+        // first or undefined
         [0];
 }
 
@@ -194,14 +197,10 @@ export const loadQuestions = (nsfw: boolean, userCards: Card[], predefinedCards:
 
     return questions;
 };
-//
-//
-// const cardsss = loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]);
-// nextId = 0;
-//
-//
+
+
 // console.log(
 //     loadQuestions(false,
 //         loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]),
-//         cardsss)
+//         loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]))
 // );
