@@ -29,8 +29,8 @@ export const parseCardText = (cardText: string, playerNames: string[]): string =
         placeholders.push(matches);
     }
 
-    let shuffledPlayerNames =  [...playerNames].sort(() => 0.5 - Math.random())
-    placeholders.forEach(placeholder =>{
+    let shuffledPlayerNames = [...playerNames].sort(() => 0.5 - Math.random())
+    placeholders.forEach(placeholder => {
         cardText = cardText.replace(placeholder[0], shuffledPlayerNames.pop())
     })
 
@@ -75,7 +75,7 @@ export const loadCardsForAllTypes = (nsfw: boolean, playerNames: string[]): Card
     cards.push(...loadCardsForType('Places', CardType.Place, nsfw, playerNames));
 
     // todo added for debug
-    // cards.push(...loadCardsForType('Persons', CardType.Player, nsfw, playerNames));
+    // cards.push(...(loadCardsForType('Persons', CardType.Player, nsfw, playerNames).slice(0, 3)));
 
     return cards;
 };
@@ -91,23 +91,22 @@ export const getCardForTypePlaceholder = (typePlaceholderOptions: string[], card
     let typeOptions: CardType[] = [];
 
     if (typePlaceholderOptions.includes("Player")) {
-       typeOptions.push(CardType.Player);
+        typeOptions.push(CardType.Player);
     }
     if (typePlaceholderOptions.includes("Person")) {
         typeOptions.push(CardType.Person);
     }
-    if (typePlaceholderOptions.includes("Object") ){
+    if (typePlaceholderOptions.includes("Object")) {
         typeOptions.push(CardType.Object);
     }
     if (typePlaceholderOptions.includes("Place")) {
         typeOptions.push(CardType.Place);
     }
-    if (typePlaceholderOptions.includes( "Activity")) {
+    if (typePlaceholderOptions.includes("Activity")) {
         typeOptions.push(CardType.Activity);
     }
     if (typePlaceholderOptions.length == 1 && typePlaceholderOptions[0] === "_") {
-        // handled without card.
-        typeOptions = [];
+        console.error("fix");
     }
 
     return cards
@@ -128,7 +127,10 @@ export const getCardForTypePlaceholder = (typePlaceholderOptions: string[], card
  * @param predefinedCards
  */
 export const parseQuestionText = (questionText: string, userCards: Card[], predefinedCards: Card[]): string => {
-    // detect placeholders
+    // first replace underscores {_}
+    questionText = questionText.replace("{_}", "___");
+
+    // detect custom placeholders
     const placeholderRegex = /\{(\w|\|)+}/g;
     let placeholders: RegExpExecArray[] = [];
     let matches;
@@ -153,13 +155,7 @@ export const parseQuestionText = (questionText: string, userCards: Card[], prede
     let i;
     for (i in placeholders) {
         const placeholder = placeholders[i][0];
-
-        let replacement;
-        if (placeholder === '{_}') {
-            replacement = '___';
-        } else {
-            replacement = replacementCards[i].text;
-        }
+        let replacement = replacementCards[i].text;
 
         questionText = questionText.replace(placeholder, replacement)
     }
@@ -199,8 +195,12 @@ export const loadQuestions = (nsfw: boolean, userCards: Card[], predefinedCards:
 };
 
 
-// console.log(
-//     loadQuestions(false,
-//         loadCardsForAllTypes(false, ["Alex", "Andi"]),
-//         loadCardsForAllTypes(false, ["Alex", "Andi"]))
-// );
+const cardsss = loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]);
+nextId = 0;
+
+
+console.log(
+    loadQuestions(false,
+        loadCardsForAllTypes(true, ["Alex", "Andi", "Pete"]),
+        cardsss)
+);

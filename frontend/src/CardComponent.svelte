@@ -13,6 +13,7 @@
   export let votable = false;
   export let votedFor = false;
   export let isWinner = false;
+  export let presenterTheme = false;
   export let score: number | undefined = undefined;
 
   const typeToStringMap = new Map<CardType, string>([
@@ -29,7 +30,7 @@
 </script>
 
 <div class="col">
-  <div class="card text-center" class:playable class:votedFor class:isWinner>
+  <div class="card text-center" class:playable class:votedFor class:isWinner class:presenterTheme>
     {#if score}
       <div
         class="card-header"
@@ -50,7 +51,7 @@
       </div>
     {/if}
     <div class="card-body">
-      <h5 class="card-title text-dark">{card.text}</h5>
+      <h5 class="card-title text-dark" class:presenterTheme>{card.text}</h5>
       {#if showAuthor}<p class="card-text">
           <small class="text-muted">by {card.author}</small>
         </p>{/if}
@@ -83,6 +84,10 @@
   .isWinner {
     box-shadow: 0px 0px 25px rgba(240, 218, 24, 0.795);
     color: black;
+  }
+
+  .presenterTheme {
+    font-size: 24pt;
   }
 
   .card-title {
