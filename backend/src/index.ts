@@ -10,14 +10,18 @@ import {
   addCard,
   assignCardMetadata,
   createNewPlayerCard,
-  createNewPunishmentCard, generatePlayerCards,
+  createNewPunishmentCard,
+  generatePlayerCards,
   getCardVotingScore,
-  getTopMostCards, handoutCards, refillHand,
+  getTopMostCards,
+  handoutCards,
+  refillHand,
+  removeCardFromHand,
   voteForCard,
 } from './server/core/card-manager';
 import { loadCardsForAllTypes, loadQuestions } from './server/core/file-manager';
-import { createInternalState, removeInternalState } from './server/core/game-manager';
-import { createOrGetPlayer, createRoom, getRoom, joinRoom, leaveRoom } from './server/core/room-manager';
+import { calculateScores, createInternalState, removeInternalState } from './server/core/game-manager';
+import { closeRoom, createOrGetPlayer, createRoom, getRoom, joinRoom, leaveRoom, removePlayer } from './server/core/room-manager';
 import { InternalState } from './server/core/state';
 import { ClientToServerEvents, ServerToClientEvents, ServerToServerEvents } from './socket-types';
 
@@ -26,6 +30,7 @@ const SERVER_LOG_PREFIX = 'server';
 
 const CATEGORY_COUNT = 4;
 const CARDS_PER_CATEGORY = 2;
+const ROUNDS_TO_PLAY = 5;
 
 const app = express();
 const server = http.createServer(app);
@@ -195,7 +200,7 @@ io.on('connection', (socket) => {
     }
 
     if (internalState.gameState.phase !== GamePhase.CardCreation) {
-      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.PunishmentCreation);
+      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.CardCreation);
       return;
     }
 
@@ -203,27 +208,21 @@ io.on('connection', (socket) => {
       const card = createNewPlayerCard(text, type);
       assignCardMetadata(card, player, internalState);
 
-      const jfasl = internalState.cardPool.get(card.type) || [];
-      jfasl.push(card);
-      internalState.cardPool.set(card.type, jfasl);
+      internalState.cardPool.push(card);
     }
 
     // All players created cards => proceed to card placement
-    if (internalState.cardPool.size === room.players.length * CARDS_PER_CATEGORY * CATEGORY_COUNT) {
-      internalState.gameState.phase = GamePhase.CardPlacement;
-
+    if (internalState.cardPool.length === room.players.length * CARDS_PER_CATEGORY * CATEGORY_COUNT) {
       const playerCards = generatePlayerCards(internalState);
-      internalState.cardPool.set(CardType.Player, playerCards);
+      internalState.cardPool.push(...playerCards);
 
       // Load predefined cards and questions
       internalState.predefinedCards = loadCardsForAllTypes(room.nsfw);
       internalState.questions = loadQuestions(room.nsfw, null, null);
 
-      // Handout cards + refill
       handoutCards(internalState);
-      refillHand(internalState);
 
-      // Set first question
+      startNextRound();
     }
 
     socket.emit('update', internalState.gameState);
@@ -232,15 +231,83 @@ io.on('connection', (socket) => {
   });
 
   socket.on('selectCard', (cardId: number) => {
+    if (!player || !room || !internalState) {
+      return;
+    }
 
+    if (internalState.gameState.phase !== GamePhase.CardPlacement) {
+      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.CardPlacement);
+      return;
+    }
+
+    // Remove card from hand
+    const card = removeCardFromHand(cardId, internalState);
+
+    // Add card to played cards
+    if (card !== undefined) {
+      internalState.gameState.playedCards.push({
+        card,
+        votes: 0,
+        dealer: player,
+      });
+    }
+
+    // All players have selected => proceed to next phase
+    if (internalState.gameState.playedCards.length === room.players.length) {
+      internalState.gameState.phase = GamePhase.CardVoting;
+    }
+
+    socket.emit('update', internalState.gameState);
+    socket.to(room.id)
+      .emit('update', internalState.gameState);
   });
 
   socket.on('voteCard', (cardId: number) => {
+    if (!player || !room || !internalState) {
+      return;
+    }
 
+    if (internalState.gameState.phase !== GamePhase.CardVoting) {
+      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.CardVoting);
+      return;
+    }
+
+    // Vote for target card
+    voteForCard(cardId, internalState);
+
+    // All players finished voting => proceed to next phase
+    if (getCardVotingScore(internalState) === room.players.length) {
+      internalState.gameState.phase = GamePhase.CardResults;
+
+      // Calculate scores
+      calculateScores(internalState);
+
+    }
+
+    socket.emit('update', internalState.gameState);
+    socket.to(room.id)
+      .emit('update', internalState.gameState);
   });
 
   socket.on('startNextRound', () => {
+    if (!player || !room || !internalState) {
+      return;
+    }
 
+    if (internalState.gameState.phase !== GamePhase.CardResults) {
+      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.CardVoting);
+      return;
+    }
+
+    if (internalState.gameState.round >= ROUNDS_TO_PLAY) {
+      internalState.gameState.phase = GamePhase.Scoreboard;
+    } else {
+      startNextRound();
+    }
+
+    socket.emit('update', internalState.gameState);
+    socket.to(room.id)
+      .emit('update', internalState.gameState);
   });
 
   // socket.on('selectBoxes', (boxes) => {
@@ -292,33 +359,31 @@ io.on('connection', (socket) => {
   // });
 
   socket.on('disconnect', () => {
-    // console.log('[DISCONNECT]', socket.id);
-    // if (player && room) {
-    //   removePlayer(player);
-    //
-    //   if (room.host === player) {
-    //     closeRoom(room);
-    //
-    //     socket.to(room.id)
-    //       .emit('roomClosed');
-    //     socket.emit('roomClosed');
-    //   } else {
-    //     leaveRoom(room, player);
-    //
-    //     socket.to(room.id)
-    //       .emit('updatePlayers', room);
-    //     socket.emit('updatePlayers', room);
-    //   }
-    // }
+    npmlog.log(SERVER_LOG_PREFIX, 'Player %s with id %s disconnected', player?.name, socket.id);
+
+    if (player && room) {
+      removePlayer(player);
+      closeRoom(room);
+
+      socket.to(room.id)
+        .emit('roomClosed');
+      socket.emit('roomClosed');
+    }
   });
 
   const startNextRound = () => {
-    // calculateScores(room);
-    // setNextPlayer(room);
-    // setGamePhase(room, Phase.Scoring);
-    //
-    // socket.to(room.id)
-    //   .emit('reportScores', room.game);
-    // socket.emit('reportScores', room.game);
+    internalState.gameState.phase = GamePhase.CardPlacement;
+
+    // Refill
+    refillHand(internalState);
+
+    // Set next question
+    // TODO: @Alex
+
+    // Reset played cards
+    internalState.gameState.playedCards = [];
+
+    // Increase round counter
+    internalState.gameState.round++;
   };
 });

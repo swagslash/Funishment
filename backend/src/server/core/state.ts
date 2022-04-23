@@ -1,4 +1,4 @@
-import { Card, CardType } from '../../model/card';
+import { Card } from '../../model/card';
 import { GameState } from '../../model/game-state';
 import { Player } from '../../model/player';
 import { Question } from '../../model/question';
@@ -24,13 +24,8 @@ export interface InternalState {
    * * player's hand
    * * question placeholder
    */
-  cardPool: Map<CardType, Card[]>;
-
-  /**
-   * All played cards (id) which cannot be reused.
-   */
-  playedCardIds: number[];
+  cardPool: Card[];
 
   questions: Question[];
-  predefinedCards: Map<CardType, Card[]>;
+  predefinedCards: Card[];
 }

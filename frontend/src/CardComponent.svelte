@@ -10,6 +10,7 @@
   export let playable = false;
   export let showAuthor = false;
   export let votable = false;
+  export let votedFor = false;
   export let isWinner = false;
   export let score: number | undefined = undefined;
 
@@ -20,10 +21,10 @@
 </script>
 
 <div class="col">
-  <div class="card text-center" class:playable>
+  <div class="card text-center" class:playable class:votedFor class:isWinner>
     {#if score}
       <div
-        class="card-header text-white"
+        class="card-header"
         class:bg-warning={isWinner}
         class:bg-secondary={!isWinner}
       >
@@ -35,6 +36,9 @@
       <h5 class="card-title text-dark">{card.text}</h5>
       {#if showAuthor}<p class="card-text">
           <small class="text-muted">by {card.author}</small>
+        </p>{/if}
+        {#if votedFor}<p class="card-text">
+          <small class="text-muted">You voted for this.</small>
         </p>{/if}
     </div>
     {#if votable}
@@ -53,6 +57,15 @@
     margin: 5px;
 
     /* width: 14rem; */
+  }
+
+  .votedFor {
+    box-shadow: 0px 0px 25px rgba(84, 245, 51, 0.795);
+  }
+
+  .isWinner {
+    box-shadow: 0px 0px 25px rgba(240, 218, 24, 0.795);
+    color: black;
   }
 
   .card-title {
