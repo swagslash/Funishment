@@ -1,15 +1,15 @@
 {
-  "name": "whats-in-the-box",
+  "name": "funishment",
   "version": "1.0.0",
   "main": "dist/index.js",
-  "repository": "https://github.com/swagslash/WhatsInTheBox.git",
+  "repository": "https://github.com/swagslash/Funishment.git",
   "author": "SwagSlash",
   "license": "MIT",
   "scripts": {
     "build": "tsc --build",
     "start-server": "yarn run build && node ./dist/index.js",
     "start-client": "yarn run build && node ./dist/client.js",
-    "start-debug": "yarn run build && node ./dist/server/core/file-manager.js",
+    "print-predefined-files": "yarn run build && node ./dist/server/core/file-manager.js",
     "clean": "rm -r dist && rm -r node_modules"
   },
   "dependencies": {
