@@ -2,6 +2,7 @@
     import EditableCardComponent from "./EditableCardComponent.svelte";
     import {Card, CardType} from "./model/card";
     import CardComponent from "./CardComponent.svelte";
+    import PunishmentDisplayComponent from "src/PunishmentDisplayComponent.svelte";
 
     // TODO get from server some day
     export let requestedTypes: CardType[] = [
@@ -14,6 +15,8 @@
         CardType.Place,
         CardType.Place,
     ];
+
+    export let punishment: Card;
 
     let index = 0;
     let currentType = requestedTypes[index];
@@ -36,6 +39,8 @@
     }
 </script>
 
+<PunishmentDisplayComponent punishment="{punishment}"></PunishmentDisplayComponent>
+
 {#if currentType}
     <h2>Add your own answer cards</h2>
     <h3>They will be distributed to players after everybody is done.</h3>
@@ -49,3 +54,4 @@
         <CardComponent card="{card}" showType showAuthor></CardComponent>
     {/each}
 </div>
+
