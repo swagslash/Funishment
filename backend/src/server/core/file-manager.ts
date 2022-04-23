@@ -2,7 +2,9 @@ import * as fs from "fs";
 import {Card, CardType} from "../../model/card";
 import {Question} from "../../model/question";
 
-let nextCardId = () => 1;
+let nextId = 0;
+let nextCardId = () => nextId ++;
+const PROB_USER_CARD_FILLS_QUESTION = .8;
 
 /**
  * Loads all the string lines from the file path.
@@ -10,8 +12,7 @@ let nextCardId = () => 1;
  */
 export const loadLinesFromDisk = (txtPath: string) => {
     let data = fs.readFileSync(txtPath).toString('utf-8');
-    let textByLine = data.split("\r\n");
-    return textByLine;
+    return data.split("\r\n");
 };
 
 /**
@@ -23,7 +24,7 @@ export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsf
     let cardTexts: string[] = [];
 
     if (nsfw) {
-      cardTexts = cardTexts.concat(loadLinesFromDisk('./resources/content/cards/NSFW' + cardTypeString + '.txt'));
+        cardTexts = cardTexts.concat(loadLinesFromDisk('./resources/content/cards/NSFW' + cardTypeString + '.txt'));
     }
     cardTexts = cardTexts.concat(loadLinesFromDisk('./resources/content/cards/SFW' + cardTypeString + '.txt'));
 
@@ -38,20 +39,90 @@ export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsf
     });
 };
 
-export const parseQuestion = (questionText: string, cards: Map<CardType, Card[]>) => {
-    return ""; // todo
+/**
+ * Returns a replacement card for the matching placeholder type.
+ * @param typePlaceholder e.g., "{Person}"
+ * @param cards
+ * @param usedCards cards already used, won't be used again.
+ */
+export const getCardForTypePlaceholder = (typePlaceholder: string, cards: Card[], usedCards: Card[]): Card => {
+    let filteredCards;
+
+    if (typePlaceholder === "{Player}") {
+        filteredCards = cards.filter(c => c.type === CardType.Player)
+    } else if (typePlaceholder === "{Person}") {
+        filteredCards = cards.filter(c => c.type === CardType.Person)
+    } else if (typePlaceholder === "{Object}") {
+        filteredCards = cards.filter(c => c.type === CardType.Object)
+    } else if (typePlaceholder === "{Place}") {
+        filteredCards = cards.filter(c => c.type === CardType.Place)
+    } else if (typePlaceholder === "{Activity}") {
+        filteredCards = cards.filter(c => c.type === CardType.Activity)
+    } else {
+        console.error("Encountered unknown placeholder: ", typePlaceholder);
+    }
+
+    // randomly select a new card
+    return filteredCards
+        .filter(c => usedCards.length == 0 || !usedCards.map(uc => uc.id).includes(c.id))
+        .sort(() => 0.5 - Math.random())
+        [0];
+}
+
+/**
+ * Fills the question placeholders with user and predefined cards.
+ * @param questionText
+ * @param userCards
+ * @param predefinedCards
+ */
+export const parseQuestionText = (questionText: string, userCards: Card[], predefinedCards: Card[]): string => {
+    questionText = "Why is {Person} afraid of {Person}?";
+
+    // detect placeholders
+    const placeholderRegex = /\{(?<type>\w+)}/g;
+    let placeholders: RegExpExecArray[] = [];
+    let matches;
+    while (matches = placeholderRegex.exec(questionText)) {
+        placeholders.push(matches);
+    }
+
+    // load replacement cards for placeholders
+    let replacementCards: Card[] = [];
+    placeholders.forEach(placeholder => {
+        const rawPlaceholder: string = placeholder[0];
+
+        if (Math.random() < PROB_USER_CARD_FILLS_QUESTION) {
+            replacementCards.push(getCardForTypePlaceholder(rawPlaceholder, userCards, replacementCards))
+        } else {
+            replacementCards.push(getCardForTypePlaceholder(rawPlaceholder, predefinedCards, replacementCards))
+        }
+    });
+
+    // replace placeholders by cards
+    let i;
+    for (i in placeholders) {
+        const placeholder = placeholders[i][0];
+        const replacement = replacementCards[i].text;
+
+        questionText = questionText.replace(placeholder, replacement)
+    }
+
+    return questionText;
 };
 
 /**
  * Load 5 questions
  * @param nsfw
- * @param card
+ * @param userCards
+ * @param predefinedCards
  */
-export const loadQuestions = (nsfw: boolean, userCards: Map<CardType, Card[]>, predefinedCards: Map<CardType, Card[]>): Question[] => {
+export const loadQuestions = (nsfw: boolean, userCards: Card[], predefinedCards: Card[]): Question[] => {
+
+    // todo map -> array
     let questionTexts: string[] = [];
 
     if (nsfw) {
-      questionTexts = questionTexts.concat(loadLinesFromDisk('./resources/content/questions/NSFWQuestions.txt'));
+        questionTexts = questionTexts.concat(loadLinesFromDisk('./resources/content/questions/NSFWQuestions.txt'));
     }
     questionTexts = questionTexts.concat(loadLinesFromDisk('./resources/content/questions/SFWQuestions.txt'));
 
@@ -64,23 +135,28 @@ export const loadQuestions = (nsfw: boolean, userCards: Map<CardType, Card[]>, p
         return question;
     });
 
-    return questions;
+    // select 5 questions
+    let selectedQuestions = questions.sort(() => 0.5 - Math.random()).slice(0, 5);
 
-    // questions.forEach(question => {
-    //     question.text = parseQuestion(question.rawText, cards);
-    // });
+    selectedQuestions.forEach(question => {
+        question.text = parseQuestionText(question.rawText, userCards, predefinedCards);
+    });
+
+    return selectedQuestions;
 };
 
 export const loadCardsForAllTypes = (nsfw: boolean): Map<CardType, Card[]> => {
-  const cards = new Map<CardType, Card[]>();
-  cards.set(CardType.Activity, loadCardsForType('Activities', CardType.Activity, nsfw));
-  cards.set(CardType.Object, loadCardsForType('Objects', CardType.Object, nsfw));
-  cards.set(CardType.Person, loadCardsForType('Persons', CardType.Person, nsfw));
-  cards.set(CardType.Place, loadCardsForType('Places', CardType.Place, nsfw));
+    const cards = new Map<CardType, Card[]>();
+    cards.set(CardType.Activity, loadCardsForType('Activities', CardType.Activity, nsfw));
+    cards.set(CardType.Object, loadCardsForType('Objects', CardType.Object, nsfw));
+    cards.set(CardType.Person, loadCardsForType('Persons', CardType.Person, nsfw));
+    cards.set(CardType.Place, loadCardsForType('Places', CardType.Place, nsfw));
 
-  return cards;
+    return cards;
 };
-//
-//
-//
-// console.log(loadQuestions(cards));
+
+
+// console.log(loadQuestions(true, null, null));
+console.log(
+    parseQuestionText(null, loadCardsForType('Persons', CardType.Person, true), loadCardsForType('Persons', CardType.Person, true))
+);
