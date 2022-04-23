@@ -1,6 +1,7 @@
-import { Card } from '../../model/card';
+import { Card, CardType } from '../../model/card';
 import { GameState } from '../../model/game-state';
 import { Player } from '../../model/player';
+import { Question } from '../../model/question';
 import { Room } from '../../model/room';
 
 export const players: Player[] = [];
@@ -23,10 +24,13 @@ export interface InternalState {
    * * player's hand
    * * question placeholder
    */
-  cardPool: Card[];
+  cardPool: Map<CardType, Card[]>;
 
   /**
    * All played cards (id) which cannot be reused.
    */
   playedCardIds: number[];
+
+  questions: Question[];
+  predefinedCards: Map<CardType, Card[]>;
 }
