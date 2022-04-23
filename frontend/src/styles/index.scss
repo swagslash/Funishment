@@ -15,6 +15,20 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
+.shittybackground {
+  position: relative;
+  overflow: hidden;
+}
+
+.shittybackground::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -100;
+  background: url(../../assets/gamebert.png) 0 0 repeat;
+}
+
 a {
   color: rgb(0, 100, 200);
   text-decoration: none;
@@ -51,7 +65,7 @@ body {
 }
 
 .cover-container {
-	max-width: 67em;
+  max-width: 67em;
 }
 
 
