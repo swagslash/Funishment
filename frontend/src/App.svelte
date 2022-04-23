@@ -143,8 +143,8 @@
 
     const kitchenSinkEnabled = false; // TODO set to false to game to work, ONLY USED FOR DEBGUGING COMPONENTS
 
-    // const socket = io('http://164.90.213.85:3000/');
-    const socket = io('http://localhost:3000');
+    const socket = io('http://funishment.swagslash.io:3000');
+    //const socket = io('http://localhost:3000');
 
     socket.on('connect', () => {
         userId = socket.id
