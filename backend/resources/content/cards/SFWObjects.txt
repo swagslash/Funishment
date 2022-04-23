@@ -10,6 +10,9 @@ An apple
 pants
 {Player}'s clothes
 {Player}'s underwear
-A egg
+An egg
 A chicken
 A dog
+world piece
+A Trashcan
+Cancer
