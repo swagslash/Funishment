@@ -1,10 +1,10 @@
 <script lang="ts">
-    import {Card} from "src/model/card";
     import {createEventDispatcher, onMount} from "svelte";
     import {fade} from 'svelte/transition';
     import CardComponent from "src/CardComponent.svelte";
+    import {Punishment} from "src/model/punishment";
 
-    export let punishment: Card;
+    export let punishment: Punishment;
     export let duration: number = 0;
     export let animationDuration = 2000;
 
@@ -25,7 +25,7 @@
 {#if !finishedInterval}
     <div out:fade="{{ duration: animationDuration }}">
         <h1>The Looming Punishment is</h1>
-        <CardComponent card="{punishment}" showType showAuthor></CardComponent>
+        <CardComponent card="{punishment.card}" showType showAuthor></CardComponent>
     </div>
 {/if}
 

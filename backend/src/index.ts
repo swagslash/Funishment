@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import { CardType } from './model/card';
 import { GamePhase } from './model/game-state';
 import { Player } from './model/player';
+import { PunishmentCondition } from './model/punishment';
 import { Room } from './model/room';
 import {
   addCard,
@@ -24,7 +25,8 @@ import {
   calculateHiddenPunishment,
   calculateScores,
   createInternalState,
-  getInternalState, getVotedPunishment,
+  getInternalState,
+  getVotedPunishment,
   removeInternalState,
 } from './server/core/game-manager';
 import { closeRoom, createOrGetPlayer, createRoom, getRoom, joinRoom, leaveRoom, removePlayer } from './server/core/room-manager';
@@ -130,30 +132,6 @@ io.on('connection', (socket) => {
     socket.to(room.id)
         .emit('update', internalState.gameState);
 
-    //
-    // if (canStartSelection(room)) {
-    //   room.open = false;
-    //   room.game = createOrGetGame(room);
-    //
-    //   if (room.game.current !== player) {
-    //     // This player cannot start a game
-    //     return;
-    //   }
-    //
-    //   console.log('guesses', room.game.round.guesses);
-    //
-    //   setGamePhase(room, Phase.Selection);
-    //
-    //   socket.emit('gameStarted', room.game);
-    //   socket.to(room.id)
-    //     .emit('gameStarted', room.game);
-    //
-    //   clearSelectionTimeout(room);
-    //   startSelectionTimeout(room, () => {
-    //     console.log('[GAME][SELECTING TIMEOUT]', room.id);
-    //     startNextRound();
-    //   });
-    // }
   });
 
   socket.on('createPunishment', (punishmentText: string) => {
@@ -211,6 +189,12 @@ io.on('connection', (socket) => {
       // Reset played cards for the next phase
       internalState.gameState.playedCards = [];
 
+      // Set punishment for the card creation phase
+      internalState.gameState.appliedPunishment = {
+        condition: PunishmentCondition.GameFinished,
+        card: internalState.votedPunishment,
+        targets: [],
+      };
     }
 
     socket.emit('update', internalState.gameState);
@@ -249,6 +233,8 @@ io.on('connection', (socket) => {
       internalState.questions = loadQuestions(room.nsfw, internalState.cardPool, internalState.predefinedCards);
 
       handoutCards(internalState);
+
+      internalState.gameState.appliedPunishment = undefined;
 
       startNextRound();
     }
