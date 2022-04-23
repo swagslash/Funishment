@@ -8,6 +8,7 @@
     export let cardType: CardType;
     export let currentPlayer: Player;
 
+    let textarea;
     let userInput: string;
 
     const typeToStringMap = new Map<CardType, string>([
@@ -19,9 +20,9 @@
 
     const typeToExampleMap = new Map<CardType, string[]>([
         [CardType.Object, ["women", "a clown car", "3 liters of coffee"]],
-        [CardType.Activity, ["going to the moon"]],
+        [CardType.Activity, ["going shopping", "eating lunch together"]],
         [CardType.Person, ["my neighbor"]],
-        [CardType.Place, ["a dark alley"]],
+        [CardType.Place, ["in a dark alley", "on the toilet", "behind the moon", ]],
     ]);
 
     function getRandomExample(t: CardType): string {
@@ -33,20 +34,21 @@
         console.log("created card with text " + userInput);
         dispatch("cardCreated", { type: cardType, text: userInput, player: currentPlayer });
         userInput = '';
+        textarea.focus()
     }
 </script>
 
 <div class="justify-content-center">
-    <div class="card text-center" style="width: 30em; margin: auto">
+    <div class="card text-center" style="margin: auto;">
         <div class="card-header text-dark">
             Enter <b>{typeToStringMap.get(cardType)}</b>
         </div>
         <div class="card-body">
-            <textarea type="text" className="form-control" bind:value={userInput} id="userInput"
-                   placeholder="{getRandomExample(cardType)}"></textarea>
+            <textarea bind:this={textarea} type="text" className="form-control" bind:value={userInput} id="userInput"
+                   placeholder="{getRandomExample(cardType)}" style="min-height: 75px"></textarea>
         </div>
-            <div class="card-footer text-muted">
-                <a on:click={onSubmit} class="card-link btn btn-outline-primary">Submit</a>
+            <div class="card-footer">
+                <button on:click={onSubmit} disabled={!userInput} class="card-link btn btn-outline-primary">Submit</button>
             </div>
     </div>
 </div>

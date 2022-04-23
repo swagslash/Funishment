@@ -1,8 +1,9 @@
 <script lang="ts">
     import EditableCardComponent from "./EditableCardComponent.svelte";
-    import {Card, CardType} from "src/model/card";
-    import CardComponent from "src/CardComponent.svelte";
+    import {Card, CardType} from "./model/card";
+    import CardComponent from "./CardComponent.svelte";
 
+    // TODO get from server some day
     export let requestedTypes: CardType[] = [
         CardType.Person,
         CardType.Person,
@@ -35,14 +36,14 @@
     }
 </script>
 
-<div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-1">
-    {#each userCards as card}
-        <CardComponent card="{card}" showType showAuthor></CardComponent>
-    {/each}
-</div>
 {#if currentType}
     <EditableCardComponent cardType="{currentType}" on:cardCreated={addCard}></EditableCardComponent>
     {:else}
     <h2>Waiting for other players to finish their answers.</h2>
     <p>You can admire your answers for now and lough at how funny you are.</p>
 {/if}
+<div style="margin-top: 10px" class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-1">
+    {#each userCards as card}
+        <CardComponent card="{card}" showType showAuthor></CardComponent>
+    {/each}
+</div>
