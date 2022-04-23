@@ -1,4 +1,4 @@
-import npmlog from 'npmlog';
+import * as npmlog from 'npmlog';
 import { GamePhase, GameState } from '../../model/game-state';
 import { Player, PlayerState } from '../../model/player';
 import { Room } from '../../model/room';
@@ -48,9 +48,16 @@ export const createInternalState = (room: Room) => {
     questions: [],
   };
 
-  npmlog.log(GAME_MANAGER_LOG_PREFIX, 'Create new internal state for room %s', room.id);
+  npmlog.info(GAME_MANAGER_LOG_PREFIX, 'Create new internal state for room %s', room.id);
+
+  internalState.push(state);
 
   return state;
+};
+
+export const getInternalState = (roomId: string): InternalState => {
+  npmlog.info(GAME_MANAGER_LOG_PREFIX, 'Get internal state for room %s', roomId);
+  return internalState.find((state) => state.roomId === roomId);
 };
 
 export const calculateScores = ({gameState}: InternalState): void => {

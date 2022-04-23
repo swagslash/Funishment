@@ -1,7 +1,7 @@
 import { Player } from '../../model/player';
 import { Room } from '../../model/room';
 import { players, rooms } from './state';
-import npmlog from 'npmlog';
+import * as npmlog from 'npmlog';
 
 const PLAYER_LOG_PREFIX = 'player';
 const ROOM_LOG_PREFIX = 'room';
@@ -24,12 +24,12 @@ export const createOrGetPlayer = (playerName: string, playerId: string): Player 
   let player = players.find((p) => p.id === playerId);
 
   if (player === undefined) {
-    npmlog.log(PLAYER_LOG_PREFIX, 'Create new player %s with id %s', playerName, playerId);
+    npmlog.info(PLAYER_LOG_PREFIX, 'Create new player %s with id %s', playerName, playerId);
     player = {id: playerId, name: playerName};
     players.push(player);
   }
 
-  npmlog.log(PLAYER_LOG_PREFIX, 'Get player %s with id %s', player.name, player.id);
+  npmlog.info(PLAYER_LOG_PREFIX, 'Get player %s with id %s', player.name, player.id);
 
   return player;
 };
@@ -41,7 +41,7 @@ export const createOrGetPlayer = (playerName: string, playerId: string): Player 
 export const removePlayer = (player: Player): void => {
   const index = players.findIndex((p) => p.id === player.id);
   if (index >= 0) {
-    npmlog.log(PLAYER_LOG_PREFIX, 'Remove player %s with id %s', player.name, player.id);
+    npmlog.info(PLAYER_LOG_PREFIX, 'Remove player %s with id %s', player.name, player.id);
     players.splice(index, 1);
   } else {
     npmlog.warn(PLAYER_LOG_PREFIX, 'Player %s with id %s not found to remove', player.name, player.id);
@@ -57,7 +57,7 @@ export const createRoom = (host: Player): Room => {
   const room: Room = {id, open: true, players: [host], host, nsfw: true};
   rooms.push(room);
 
-  npmlog.log(ROOM_LOG_PREFIX, 'New room %s created with host player %s', room.id, host);
+  npmlog.info(ROOM_LOG_PREFIX, 'New room %s created with host player %s', room.id, host);
 
   return room;
 };
@@ -81,7 +81,7 @@ export const joinRoom = (room: Room, player: Player): boolean => {
     return false;
   }
 
-  npmlog.log(ROOM_LOG_PREFIX, 'Player %s joins room %s', player.name, room.id);
+  npmlog.info(ROOM_LOG_PREFIX, 'Player %s joins room %s', player.name, room.id);
   room.players.push(player);
 
   return true;
@@ -95,7 +95,7 @@ export const joinRoom = (room: Room, player: Player): boolean => {
 export const leaveRoom = (room: Room, player: Player): void => {
   const index = room.players.findIndex((p) => p.id === player.id);
   if (index >= 0) {
-    npmlog.log(ROOM_LOG_PREFIX, 'Player %s leaves room %s', player.name, room.id);
+    npmlog.info(ROOM_LOG_PREFIX, 'Player %s leaves room %s', player.name, room.id);
     room.players.splice(index, 1);
   }
 
@@ -111,7 +111,7 @@ export const leaveRoom = (room: Room, player: Player): void => {
 export const closeRoom = (room: Room): void => {
   const index = rooms.findIndex((r) => r.id === room.id);
   if (index >= 0) {
-    npmlog.log(ROOM_LOG_PREFIX, 'Close room %s', room.id);
+    npmlog.info(ROOM_LOG_PREFIX, 'Close room %s', room.id);
     rooms.splice(index, 1);
   }
 };

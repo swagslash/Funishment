@@ -1,4 +1,4 @@
-import npmlog from 'npmlog';
+import * as npmlog from 'npmlog';
 import { Card, CardType } from '../../model/card';
 import { Player } from '../../model/player';
 import { InternalState } from './state';
@@ -63,7 +63,7 @@ export const getCardVotingScore = ({gameState: {playedCards}}: InternalState): n
 };
 
 export const getTopMostCards = ({gameState: {playedCards}}: InternalState): [Card, Card] => {
-  const sorted = playedCards.sort((a, b) => a.votes - b.votes);
+  const sorted = playedCards.sort((a, b) => b.votes - a.votes);
 
   return [sorted[0].card, sorted[1].card];
 };

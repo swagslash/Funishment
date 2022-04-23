@@ -1,3 +1,113 @@
+import * as npmlog from 'npmlog';
+import { io, Socket } from 'socket.io-client';
+import { CardType } from './model/card';
+import { GamePhase, GameState } from './model/game-state';
+import { Room } from './model/room';
+import { ClientToServerEvents, ServerToClientEvents } from './socket-types';
+
+const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:3000');
+
+const roomToJoin = process.env.ROOM_ID ?? undefined;
+const playerName = process.env.NAME ?? '><((*>';
+
+let playerId: string;
+let myRoom: Room;
+let gameState: GameState;
+
+socket.on('connect', () => {
+  npmlog.info('connect', 'New connection %s', socket.id);
+  playerId = socket.id;
+});
+
+if (roomToJoin === undefined) {
+  socket.emit('createRoom', playerName);
+} else {
+  socket.emit('joinRoom', playerName, roomToJoin);
+}
+
+socket.on('roomCreated', (room) => {
+  npmlog.info('room',  'Room created %s', room.id);
+  myRoom = room;
+});
+
+socket.on('roomUpdated', (room) => {
+  myRoom = room;
+  npmlog.info('room', 'Players in room %s: %s', myRoom.id, room.players.map((p) => p.name));
+
+  if (room.players.length === 3) {
+    npmlog.info('game', 'start new game');
+    socket.emit('startGame');
+  }
+});
+
+socket.on('roomClosed', () => {
+  npmlog.info('room', 'Room closed');
+});
+
+socket.on('update', (state) => {
+  if (gameState?.phase === state.phase) {
+    npmlog.info('state', 'Got same state, skipping logic');
+    return;
+  }
+
+  switch (state.phase) {
+    case GamePhase.PunishmentCreation:
+      const punishment = `Punishment from ${playerName}`;
+      npmlog.info('punishment', 'Create punishment %s in 3s', punishment);
+      setTimeout(() => {
+        npmlog.info('punishment', 'Send punishment %s', punishment);
+        socket.emit('createPunishment', punishment);
+      }, 3_000);
+      break;
+    case GamePhase.PunishmentVoting:
+      npmlog.info('punishment', 'Available punishments for voting: %s', state.playedCards.map((p) => p.card.id));
+
+      const index = Math.floor(Math.random() * state.playedCards.length);
+      const vote = state.playedCards[index]
+
+      setTimeout(() => {
+        npmlog.info('punishment', 'Vote for punishment %s', vote.card);
+        socket.emit('votePunishment', vote.card.id);
+      }, 3_000);
+
+      break;
+    case GamePhase.CardCreation:
+      npmlog.info('cards', 'Card creation');
+
+      setTimeout(() => {
+        const cards: { type: CardType; text: string}[] = [
+          { type: CardType.Person, text: `${playerName}-person1` },
+          { type: CardType.Person, text: `${playerName}-person2` },
+          { type: CardType.Object, text: `${playerName}-object1` },
+          { type: CardType.Object, text: `${playerName}-object2` },
+          { type: CardType.Place, text: `${playerName}-place1` },
+          { type: CardType.Place, text: `${playerName}-place2` },
+          { type: CardType.Activity, text: `${playerName}-activity1` },
+          { type: CardType.Activity, text: `${playerName}-activity2` },
+        ];
+        npmlog.info('cards', 'Sending 8 cards');
+        socket.emit('createCards', cards);
+      }, 3_000);
+
+      break;
+    case GamePhase.CardPlacement:
+      npmlog.info('round', 'Question %s.', state.question);
+      const hand = state.playerState.find((p) => p.player.id === playerId).hand;
+      npmlog.info('round', 'Player hand: %s', hand);
+
+      setTimeout(() => {
+        const index = Math.floor(Math.random() * hand.length);
+        const selection = hand[index];
+        npmlog.info('round', 'Selected card from hand %s', selection);
+
+        socket.emit('selectCard', selection.id);
+      }, 3_000);
+  }
+
+  gameState = state;
+});
+
+
 // import { io, Socket } from 'socket.io-client';
 // import { Game } from './model/game';
 // import { Room } from './model/room';

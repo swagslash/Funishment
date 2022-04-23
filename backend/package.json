@@ -7,8 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc --build",
-    "start-server": "node ./dist/index.js",
-    "start-client": "node ./dist/client.js",
+    "start-server": "yarn run build && node ./dist/index.js",
+    "start-client": "yarn run build && node ./dist/client.js",
     "start-debug": "tsc --build && node ./dist/debug.js",
     "clean": "rm -r dist && rm -r node_modules"
   },

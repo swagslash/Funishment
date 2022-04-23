@@ -1,5 +1,5 @@
 export interface Question {
   text: string;
-  rawText: string;
-  values: object[];
+  rawText?: string,
+  values?: object[];
 }
