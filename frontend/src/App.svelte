@@ -15,6 +15,7 @@
             </div>
         </header>
 
+
         {#if kitchenSinkEnabled}
             <KitchenSink></KitchenSink>
         {/if}
@@ -134,6 +135,7 @@
     import {Player} from "src/model/player";
     import VotingComponent from "src/VotingComponent.svelte";
     import KitchenSink from "./KitchenSink.svelte";
+    import HandCards from "src/HandCards.svelte";
 
     let game: GameState;
     let userId: string;
@@ -143,7 +145,7 @@
     let roomNotFound: boolean = false;
     let startGameDisabled: boolean = false;
 
-    const kitchenSinkEnabled = false; // TODO set to false to game to work, ONLY USED FOR DEBGUGING COMPONENTS
+    const kitchenSinkEnabled = true; // TODO set to false to game to work, ONLY USED FOR DEBGUGING COMPONENTS
 
     // const socket = io('http://164.90.213.85:3000/');
     const socket = io('http://localhost:3000');

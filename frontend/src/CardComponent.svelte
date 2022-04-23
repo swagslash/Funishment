@@ -1,72 +1,104 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-  import {Card, CardType} from "./model/card";
+    import {createEventDispatcher} from "svelte";
+    import {Card, CardType} from "./model/card";
+    import {Player} from "./model/player";
 
-  const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 
-  export let card: Card;
+    export let card: Card;
 
-  export let playable = false;
-  export let showAuthor = false;
-  export let showType = false;
-  export let votable = false;
-  export let votedFor = false;
-  export let isWinner = false;
-  export let presenterTheme = false;
-  export let score: number | undefined = undefined;
+    export let dealer: Player | undefined = undefined;
+    export let votes: number | undefined = undefined;
+    export let currentPlayerId: string | undefined;
 
-  const typeToStringMap = new Map<CardType, string>([
-    [CardType.Object, "Object"],
-    [CardType.Activity, "Activity"],
-    [CardType.Person, "Person"],
-    [CardType.Place, "Place"],
-    [CardType.Punishment, "Punishment"],
-  ]);
+    export let playable = false;
+    export let played = false;
+    export let showAuthor = false;
+    export let showDealer = false;
+    export let showType = false;
+    export let votable = false;
+    export let votedFor = false;
+    export let isWinner = false;
+    export let presenterTheme = false;
 
-  function onVote() {
-    console.log("voted for " + card.id);
-    votedFor = true;
-    dispatch("voted", { id: card.id });
-  }
+    const typeToStringMap = new Map<CardType, string>([
+        [CardType.Object, "Object"],
+        [CardType.Activity, "Activity"],
+        [CardType.Person, "Person"],
+        [CardType.Place, "Place"],
+        [CardType.Punishment, "Punishment"],
+    ]);
+
+    function onVote() {
+        console.log("voted for " + card.id);
+        votedFor = true;
+        dispatch("voted", {id: card.id});
+    }
+
+    function onSelected() {
+        if (playable) {
+            console.log("played " + card.id);
+            played = true;
+            playable = false;
+            dispatch("play", {id: card.id});
+        }
+    }
 </script>
 
 <div class="col">
-  <div class="card text-center" class:playable class:votedFor class:isWinner class:presenterTheme>
-    {#if score}
-      <div
-        class="card-header"
-        class:bg-warning={isWinner}
-        class:bg-secondary={!isWinner}
-      >
-        {#if isWinner}⭐{/if}
-        {score} Votes {#if isWinner}⭐{/if}
-      </div>
-    {:else if showType}
-      <div class="card-header"
-           class:object={card.type === CardType.Object}
-           class:person={card.type === CardType.Person}
-           class:place={card.type === CardType.Place}
-           class:activity={card.type === CardType.Activity}
-           class:punishment={card.type === CardType.Punishment}
-      >
-        {typeToStringMap.get(card.type)}
-      </div>
-    {/if}
-    <div class="card-body">
-      <h5 class="card-title text-dark" class:presenterTheme>{card.text}</h5>
-      {#if showAuthor}<p class="card-text">
-          <small class="text-muted">by {card.author.name}</small>
-        </p>{/if}
-        {#if votedFor}<p class="card-text">
-          <small class="text-muted">You voted for this.</small>
-        </p>{/if}
+    <div class="card text-center" class:playable class:votedFor class:isWinner class:presenterTheme class:played
+         on:click={onSelected}>
+        {#if votes}
+            <div class="card-header"
+                 class:bg-warning={isWinner}
+                 class:bg-secondary={!isWinner}>
+                {#if isWinner}⭐{/if}{votes} Votes
+                {#if isWinner}⭐{/if}
+            </div>
+        {:else if showType}
+            <div class="card-header"
+                 class:object={card.type === CardType.Object}
+                 class:person={card.type === CardType.Person}
+                 class:place={card.type === CardType.Place}
+                 class:activity={card.type === CardType.Activity}
+                 class:punishment={card.type === CardType.Punishment}
+            >
+                {typeToStringMap.get(card.type)}
+            </div>
+        {/if}
+        <div class="card-body">
+            <h5 class="card-title text-dark" class:presenterTheme>{card.text}</h5>
+            {#if showAuthor}
+                <p class="card-text">
+                    <small class="text-muted">created by {card.author.name}</small>
+                </p>
+            {/if}
+            {#if showDealer && dealer}
+                <p class="card-text">
+                    <small class="text-muted">played by {dealer.name}</small>
+                </p>
+            {/if}
+            {#if votedFor}
+                <p class="card-text">
+                    <small class="text-muted">You voted for this.</small>
+                </p>
+            {/if}
+            {#if played}
+                <p class="card-text">
+                    <small class="text-muted">You played this.</small>
+                </p>
+            {/if}
+        </div>
+        {#if votable}
+            <div class="card-footer text-muted">
+                {#if dealer.id !== currentPlayerId}
+                    <button on:click={onVote} class="btn btn-outline-secondary">🔥 Vote</button>
+                {:else}
+                    <small class="text-muted">☠️ Can't vote yours</small>
+                {/if}
+            </div>
+        {/if}
     </div>
-    {#if votable}
-      <div class="card-footer text-muted">
-        <button on:click={onVote} class="btn btn-outline-secondary">🔥 Vote</button>
-      </div>
-    {/if}
-  </div>
 </div>
 
 <style lang="scss">
@@ -83,6 +115,10 @@
     box-shadow: 0px 0px 25px rgba(84, 245, 51, 0.795);
   }
 
+  .played {
+    box-shadow: 0px 0px 25px rgba(51, 129, 245, 0.79);
+  }
+
   .isWinner {
     box-shadow: 0px 0px 25px rgba(240, 218, 24, 0.795);
     color: black;
@@ -94,7 +130,7 @@
 
   .card-title {
     font-family: Neucha, -apple-system, system-ui, BlinkMacSystemFont,
-      "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 
   .playable {

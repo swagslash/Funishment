@@ -1,17 +1,18 @@
 <script lang="ts">
     import CardComponent from "./CardComponent.svelte";
-    import {Card} from "src/model/card";
+    import {PlayedCard} from "src/model/card";
     import {onMount} from "svelte";
-    import {fade, fly} from 'svelte/transition';
+    import {fly} from 'svelte/transition';
     import VotingComponent from "src/VotingComponent";
 
-    export let cards: Card[];
+    export let playedCards: PlayedCard[];
     export let animationDuration: number = 2000;
     export let slideTime: number = 7000;
+    export let currentPlayerId: string;
 
     let index = 0;
 
-    let card = cards[index];
+    let playedCard = playedCards[index];
 
     let visibleFirst = false;
     let visibleSecond = false;
@@ -29,13 +30,13 @@
             visibleSecond = false;
 
             index++;
-            if (index >= cards.length) {
+            if (index >= playedCards.length) {
                 setTimeout(() => {
                     finishedSlideshow = true;
                 }, animationDuration);
                 return;
             }
-            card = cards[index];
+            playedCard = playedCards[index];
             setTimeout(() => {
                 if (makeVisible === 2) {
                     visibleSecond = true;
@@ -51,26 +52,27 @@
         };
     });
 
-    function handleVoting(e: any) {
+    function sendVotes(e: any) {
+        //TODO send votes
         console.log(e.detail.id);
     }
 </script>
 
 {#if finishedSlideshow}
     <div>
-        <VotingComponent cards="{cards}" on:votingComplete={handleVoting}></VotingComponent>
+        <VotingComponent currentPlayerId={currentPlayerId} cards="{playedCards}" on:votingComplete={sendVotes}></VotingComponent>
     </div>
 {:else}
     <div >
         {#if index % 2 === 0 && visibleFirst}
             <div class="presented" in:fly="{{ x: +200, duration: animationDuration }}"
                  out:fly="{{ x: -200, duration: animationDuration }}">
-                <CardComponent presenterTheme card="{card}"></CardComponent>
+                <CardComponent presenterTheme card="{playedCard.card}"></CardComponent>
             </div>
         {:else if visibleSecond}
             <div class="presented" in:fly="{{ x: +200, duration: animationDuration }}"
                  out:fly="{{ x: -200, duration: animationDuration }}">
-                <CardComponent presenterTheme card="{card}"></CardComponent>
+                <CardComponent presenterTheme card="{playedCard.card}"></CardComponent>
             </div>
         {/if}
     </div>

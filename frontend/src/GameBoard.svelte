@@ -32,7 +32,7 @@
         {:else if game.phase === GamePhase.CardPlacement}
             <!-- TODO implement hand with cards (game.playerState find with id) -->
         {:else if game.phase === GamePhase.CardVoting}
-            <CardPresenter cards={game.playedCards.map((pc) => pc.card)}></CardPresenter>
+            <CardPresenter currentPlayerId={userId} cards={game.playedCards.map((pc) => pc.card)}></CardPresenter>
             <!-- TODO card to playablecard everywhere -->
         {:else if game.phase === GamePhase.CardResults}
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
