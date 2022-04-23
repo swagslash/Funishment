@@ -1,6 +1,7 @@
 import * as npmlog from 'npmlog';
 import { GamePhase, GameState } from '../../model/game-state';
 import { Player, PlayerState } from '../../model/player';
+import { Punishment, PUNISHMENT_PROBABILITIES, PunishmentCondition } from '../../model/punishment';
 import { Room } from '../../model/room';
 import { InternalState, internalState } from './state';
 
@@ -81,6 +82,75 @@ export const calculateScores = ({gameState}: InternalState): void => {
       updateScore(winningCard.dealer, 2, gameState);
     }
   }
+};
+
+export const getVotedPunishment = ({votedPunishment, gameState}: InternalState): Punishment => {
+  const { playerState } = gameState;
+
+  const lowestScore = playerState.reduce((min, current) => min > current.score ? current.score : min, Number.POSITIVE_INFINITY);
+  const targets = playerState.filter((ps) => ps.score === lowestScore)
+    .map((ps) => ps.player);
+
+  return {
+    card: votedPunishment,
+    targets,
+    condition: PunishmentCondition.GameFinished,
+  };
+};
+
+export const calculateHiddenPunishment = ({hiddenPunishments, gameState}: InternalState, lastPlayer: Player): Punishment | undefined => {
+  const {playedCards, playerState, round} = gameState;
+  const probability = PUNISHMENT_PROBABILITIES[round - 1];
+
+  // No punishment
+  if (Math.random() > probability || hiddenPunishments.length === 0) {
+    return undefined;
+  }
+
+  // Check for all votes
+  const playerCount = playedCards.length;
+  const topPlayer = playedCards.find((ps) => ps.votes === playerCount - 1);
+  if (topPlayer !== undefined) {
+    return {
+      condition: PunishmentCondition.AllVotes,
+      targets: [topPlayer.dealer],
+      card: hiddenPunishments.shift(),
+    };
+  }
+
+  // Check for same scores
+  const groupsMap = playerState.reduce((groups, current) => {
+    if (groups[current.score]) {
+      groups[current.score].push(current);
+    } else {
+      groups[current.score] = [current];
+    }
+
+    return groups;
+  }, {} as Record<number, PlayerState[]>);
+  const playersWithSameScore = Object.entries(groupsMap)
+    .filter(([score]) => (+score) > 0)
+    .filter(([_, ps]) => ps.length > 1)
+    .map(([, ps]) => ps)
+    .flat()
+    .map((ps) => ps.player);
+
+  if (playersWithSameScore.length > 0) {
+    return {
+      condition: PunishmentCondition.SameScore,
+      targets: playersWithSameScore,
+      card: hiddenPunishments.shift(),
+    }
+  }
+
+  return {
+    condition: PunishmentCondition.LastToVote,
+    targets: [lastPlayer],
+    card: hiddenPunishments.shift(),
+  };
+
+
+
 };
 
 const updateScore = (player: Player | undefined, score: number, state: GameState): void => {

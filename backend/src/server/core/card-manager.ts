@@ -3,7 +3,7 @@ import { Card, CardType } from '../../model/card';
 import { Player } from '../../model/player';
 import { InternalState } from './state';
 
-const CARD_MANAGER_LOG_PREFIX = 'log-manager';
+const CARD_MANAGER_LOG_PREFIX = 'card-manager';
 const MAX_PLAYER_CARDS = 12;
 
 /**
@@ -55,6 +55,9 @@ export const voteForCard = (cardId: number, {gameState}: InternalState): void =>
   const playedCard = gameState.playedCards.find((c) => c.card.id === cardId);
   if (playedCard) {
     playedCard.votes++;
+    npmlog.info(CARD_MANAGER_LOG_PREFIX, 'Vote for card %s (votes: %s)', playedCard.card, playedCard.votes);
+  } else {
+    npmlog.warn(CARD_MANAGER_LOG_PREFIX, 'Card with id %s not found for voting', cardId);
   }
 };
 
@@ -62,10 +65,9 @@ export const getCardVotingScore = ({gameState: {playedCards}}: InternalState): n
   return playedCards.reduce((total, next) => total + next.votes, 0);
 };
 
-export const getTopMostCards = ({gameState: {playedCards}}: InternalState): [Card, Card] => {
-  const sorted = playedCards.sort((a, b) => b.votes - a.votes);
-
-  return [sorted[0].card, sorted[1].card];
+export const getTopMostCards = ({gameState: {playedCards}}: InternalState): Card[] => {
+  return playedCards.sort((a, b) => b.votes - a.votes)
+    .map((card) => card.card);
 };
 
 export const createNewPlayerCard = (text: string, type: CardType): Card => {

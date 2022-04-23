@@ -17,7 +17,7 @@ export interface InternalState {
   nextCardId: number;
   gameState: GameState;
   votedPunishment?: Card;
-  hiddenPunishment?: Card;
+  hiddenPunishments?: Card[];
   /**
    * Only user generated cards.
    * Used for

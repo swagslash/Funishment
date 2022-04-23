@@ -20,7 +20,13 @@ import {
   voteForCard,
 } from './server/core/card-manager';
 import { loadCardsForAllTypes, loadQuestions } from './server/core/file-manager';
-import { calculateScores, createInternalState, getInternalState, removeInternalState } from './server/core/game-manager';
+import {
+  calculateHiddenPunishment,
+  calculateScores,
+  createInternalState,
+  getInternalState, getVotedPunishment,
+  removeInternalState,
+} from './server/core/game-manager';
 import { closeRoom, createOrGetPlayer, createRoom, getRoom, joinRoom, leaveRoom, removePlayer } from './server/core/room-manager';
 import { InternalState } from './server/core/state';
 import { ClientToServerEvents, ServerToClientEvents, ServerToServerEvents } from './socket-types';
@@ -40,7 +46,7 @@ const server = http.createServer(app);
 
 const start = async () => {
   server.listen(SERVER_PORT, () => {
-    npmlog.info(SERVER_LOG_PREFIX, 'Starting server, listening at port %s!', SERVER_PORT);
+    npmlog.info(SERVER_LOG_PREFIX, 'Starting server, listening at port %s', SERVER_PORT);
   });
 };
 
@@ -160,7 +166,7 @@ io.on('connection', (socket) => {
     }
 
     if (internalState.gameState.phase !== GamePhase.PunishmentCreation) {
-      npmlog.warn(PUNISHMENT_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.PunishmentCreation);
+      npmlog.warn(PUNISHMENT_LOG_PREFIX, '[Creation] Invalid state: Room %s, player %s, phase: %s', room.id, player.name, internalState.gameState.phase);
       return;
     }
 
@@ -187,7 +193,7 @@ io.on('connection', (socket) => {
     }
 
     if (internalState.gameState.phase !== GamePhase.PunishmentVoting) {
-      npmlog.warn(PUNISHMENT_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.PunishmentCreation);
+      npmlog.warn(PUNISHMENT_LOG_PREFIX, '[Voting] Invalid state: Room %s, player %s, phase: %s', room.id, player.name, internalState.gameState.phase);
       return;
     }
 
@@ -196,11 +202,11 @@ io.on('connection', (socket) => {
     // All players finished voting => set punishments and proceed to next phase
     if (getCardVotingScore(internalState) === room.players.length) {
       internalState.gameState.phase = GamePhase.CardCreation;
-      const [voted, hidden] = getTopMostCards(internalState);
-      internalState.votedPunishment = voted;
-      internalState.hiddenPunishment = hidden;
+      const punishments = getTopMostCards(internalState);
+      internalState.votedPunishment = punishments.splice(0, 1)[0];
+      internalState.hiddenPunishments = punishments;
 
-      npmlog.info(PUNISHMENT_LOG_PREFIX, 'Voted punishment %s %s, hidden punishment: %s %s', voted.id, voted.text, hidden.id, hidden.text);
+      npmlog.info(PUNISHMENT_LOG_PREFIX, 'Voted punishment %s, # of hidden punishment: %s', internalState.votedPunishment,internalState.hiddenPunishments.length);
 
       // Reset played cards for the next phase
       internalState.gameState.playedCards = [];
@@ -218,7 +224,7 @@ io.on('connection', (socket) => {
     }
 
     if (internalState.gameState.phase !== GamePhase.CardCreation) {
-      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.CardCreation);
+      npmlog.warn(CARDS_LOG_PREFIX, '[Creation] Invalid state: Room %s, player %s, phase: %s', room.id, player.name, internalState.gameState.phase);
       return;
     }
 
@@ -258,7 +264,7 @@ io.on('connection', (socket) => {
     }
 
     if (internalState.gameState.phase !== GamePhase.CardPlacement) {
-      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.CardPlacement);
+      npmlog.warn(CARDS_LOG_PREFIX, '[Placement] Invalid state: Room %s, player %s, phase: %s', room.id, player.name, internalState.gameState.phase);
       return;
     }
 
@@ -277,6 +283,9 @@ io.on('connection', (socket) => {
     // All players have selected => proceed to next phase
     if (internalState.gameState.playedCards.length === room.players.length) {
       internalState.gameState.phase = GamePhase.CardVoting;
+      internalState.gameState.appliedPunishment = undefined;
+
+      npmlog.info(ROUND_LOG_PREFIX, 'All players in room %s placed their cards', room.id);
     }
 
     socket.emit('update', internalState.gameState);
@@ -290,7 +299,7 @@ io.on('connection', (socket) => {
     }
 
     if (internalState.gameState.phase !== GamePhase.CardVoting) {
-      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.CardVoting);
+      npmlog.warn(CARDS_LOG_PREFIX, '[Voting] Invalid state: Room %s, player %s, phase: %s', room.id, player.name, internalState.gameState.phase);
       return;
     }
 
@@ -299,11 +308,17 @@ io.on('connection', (socket) => {
 
     // All players finished voting => proceed to next phase
     if (getCardVotingScore(internalState) === room.players.length) {
+      npmlog.info(ROUND_LOG_PREFIX, 'All players in room %s finished voting', room.id);
       internalState.gameState.phase = GamePhase.CardResults;
 
       // Calculate scores
       calculateScores(internalState);
 
+      const hiddenPunishment = calculateHiddenPunishment(internalState, player);
+      if (hiddenPunishment) {
+        npmlog.info(PUNISHMENT_LOG_PREFIX, 'Room %s: Punishment %s (%s) for players %s', room.id, hiddenPunishment.card.text, hiddenPunishment.condition, hiddenPunishment.targets.map((p) => p.name));
+        internalState.gameState.appliedPunishment = hiddenPunishment;
+      }
     }
 
     socket.emit('update', internalState.gameState);
@@ -316,18 +331,22 @@ io.on('connection', (socket) => {
       return;
     }
 
-    if (internalState.gameState.phase !== GamePhase.CardResults) {
-      npmlog.warn(SERVER_LOG_PREFIX, 'Room %s is not in %s state', room.id, GamePhase.CardVoting);
-      return;
-    }
-
     if (room.host.id !== player.id) {
       npmlog.warn(SERVER_LOG_PREFIX, 'Current player %s of room %s not host', player.name, room.id);
       return;
     }
 
+    if (internalState.gameState.phase !== GamePhase.CardResults) {
+      npmlog.warn(CARDS_LOG_PREFIX, '[Results] Invalid state: Room %s, player %s, phase: %s', room.id, player.name, internalState.gameState.phase);
+      return;
+    }
+
     if (internalState.gameState.round >= ROUNDS_TO_PLAY) {
       internalState.gameState.phase = GamePhase.Scoreboard;
+
+      // Set last punishment
+      internalState.gameState.appliedPunishment = getVotedPunishment(internalState);
+      npmlog.info(ROUND_LOG_PREFIX, 'Game finished for room %s', room.id);
     } else {
       startNextRound();
     }
@@ -336,54 +355,6 @@ io.on('connection', (socket) => {
     socket.to(room.id)
       .emit('update', internalState.gameState);
   });
-
-  // socket.on('selectBoxes', (boxes) => {
-    // if (!room || !player) {
-    //   return;
-    // }
-    //
-    // if (canStartGuessing(room)) {
-    //
-    //   clearSelectionTimeout(room);
-    //   clearGuessingTimeout(room);
-    //   startGuessingTimeout(room, () => {
-    //     console.log('[GAME][GUESS TIMEOUT]', room.id);
-    //     startNextRound();
-    //   });
-    //
-    //   setGamePhase(room, Phase.Guessing);
-    //   console.log('[GAME][BOXES]', room.id, player.name, boxes);
-    //   room.game.round.boxes = boxes;
-    //
-    //   socket.to(room.id)
-    //     .emit('guessBoxes', room.game);
-    //   socket.emit('guessBoxes', room.game);
-    // }
-  // });
-
-  // socket.on('guessBoxes', (guess) => {
-    // if (!room || !player) {
-    //   return;
-    // }
-    //
-    // if (canGuess(room)) {
-    //   console.log('[GAME][GUESS]', room.id, player.name, guess);
-    //   room.game.round.guesses[player.id] = guess;
-    //
-    //   const alreadyGuessed = Object.keys(room.game.round.guesses).length;
-    //   const maxGuesses = room.players.length - 1;               // -1 for active player
-    //
-    //   console.log('already guessed', alreadyGuessed);
-    //   console.log('players to guess', room.players.length - 1);
-    //
-    //   if (alreadyGuessed === maxGuesses) {
-    //     clearGuessingTimeout(room);
-    //     startNextRound();
-    //   } else {
-    //     console.log('[GAME][GUESS MISSING]', room.id, maxGuesses - alreadyGuessed);
-    //   }
-    // }
-  // });
 
   socket.on('disconnect', () => {
     npmlog.info(SERVER_LOG_PREFIX, 'Player %s with id %s disconnected', player?.name, socket.id);
@@ -405,8 +376,6 @@ io.on('connection', (socket) => {
     refillHand(internalState);
 
     // Set next question
-    // TODO: @Alex
-
     internalState.gameState.question = internalState.questions.pop();
 
     // Reset played cards
@@ -418,3 +387,4 @@ io.on('connection', (socket) => {
     npmlog.info(ROUND_LOG_PREFIX, 'Starting round %s in room %s', internalState.gameState.round, room.id);
   };
 });
+

@@ -34,7 +34,7 @@ socket.on('roomUpdated', (room) => {
   myRoom = room;
   npmlog.info('room', 'Players in room %s: %s', myRoom.id, room.players.map((p) => p.name));
 
-  if (room.players.length === 3) {
+  if (room.players.length === 4) {
     npmlog.info('game', 'start new game');
     socket.emit('startGame');
   }
@@ -47,6 +47,7 @@ socket.on('roomClosed', () => {
 socket.on('update', (state) => {
   if (gameState?.phase === state.phase) {
     npmlog.info('state', 'Got same state, skipping logic');
+
     return;
   }
 
@@ -58,6 +59,7 @@ socket.on('update', (state) => {
         npmlog.info('punishment', 'Send punishment %s', punishment);
         socket.emit('createPunishment', punishment);
       }, 3_000);
+
       break;
     case GamePhase.PunishmentVoting:
       npmlog.info('punishment', 'Available punishments for voting: %s', state.playedCards.map((p) => p.card.id));
@@ -91,47 +93,48 @@ socket.on('update', (state) => {
 
       break;
     case GamePhase.CardPlacement:
-      npmlog.info('round', 'Question %s.', state.question);
+      npmlog.info('placement', 'Question %s.', state.question.text);
       const hand = state.playerState.find((p) => p.player.id === playerId).hand;
-      npmlog.info('round', 'Player hand: %s', hand);
 
       setTimeout(() => {
         const index = Math.floor(Math.random() * hand.length);
         const selection = hand[index];
-        npmlog.info('round', 'Selected card from hand %s', selection);
+        npmlog.info('placement', 'Answer: %s', selection);
 
         socket.emit('selectCard', selection.id);
       }, 3_000);
 
+      break;
     case GamePhase.CardVoting:
-      npmlog.info('round', 'Card voting %s', state.playedCards);
+      npmlog.info('voting', 'Card voting');
 
       setTimeout(() => {
         const index = Math.floor(Math.random() * state.playedCards.length);
         const vote = state.playedCards[index];
 
-        npmlog.info('round', 'Voting for %s', vote.card);
+        npmlog.info('voting', 'Voting for %s', vote.card.text);
 
         socket.emit('voteCard', vote.card.id);
       }, 3_000);
 
       break;
-
     case GamePhase.CardResults:
       npmlog.info('round', 'Card results');
       const results = state.playedCards.map(({card, votes}) => {
-        return {
-          'id': card.id,
-          'text': card.text,
-          'votes': votes,
-        };
+        return `${card.text} (${votes})`;
       });
-      npmlog.info('round', 'Results: %s', results);
+      npmlog.info('round', 'Results: %s\n\n', results);
+
+      if (state.appliedPunishment) {
+        npmlog.info('punishment', 'Punishment: Players %s have to %s', state.appliedPunishment.targets.map((p) => p.name), state.appliedPunishment.card.text);
+      }
 
       setTimeout(() => {
         npmlog.info('round', 'Start next round');
         socket.emit('startNextRound');
       }, 3_000);
+
+      break;
     case GamePhase.Scoreboard:
       npmlog.info('round', 'Scoreboard', state.playerState.map((ps) => {
         return {
@@ -139,6 +142,10 @@ socket.on('update', (state) => {
           'score': ps.score,
         };
       }));
+
+      if (state.appliedPunishment) {
+        npmlog.info('punishment', 'FINAL Punishment: Players %s have to %s', state.appliedPunishment.targets.map((p) => p.name), state.appliedPunishment.card.text);
+      }
 
       break;
   }
