@@ -3,6 +3,7 @@
     import {Card, CardType} from "./model/card";
     import CardComponent from "./CardComponent.svelte";
     import PunishmentDisplayComponent from "src/PunishmentDisplayComponent.svelte";
+    import {createEventDispatcher} from "svelte";
 
     // TODO get from server some day
     export let requestedTypes: CardType[] = [
@@ -17,6 +18,8 @@
     ];
 
     export let card: Card;
+
+    const dispatch = createEventDispatcher();
 
     let index = 0;
     let currentType = requestedTypes[index];
@@ -34,12 +37,14 @@
         if (index < requestedTypes.length) {
             currentType = requestedTypes[index];
         } else {
+            dispatch('created', {userCards})
             currentType = undefined;
         }
     }
 </script>
 
-<PunishmentDisplayComponent card="{card}"></PunishmentDisplayComponent>
+<!--TODO-->
+<!--<PunishmentDisplayComponent card="{card}"></PunishmentDisplayComponent>-->
 
 {#if currentType}
     <h2>Add your own answer cards</h2>

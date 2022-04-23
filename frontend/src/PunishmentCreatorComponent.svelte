@@ -2,9 +2,12 @@
     import EditableCardComponent from "./EditableCardComponent.svelte";
     import {Card, CardType} from "./model/card";
     import CardComponent from "./CardComponent.svelte";
+    import {createEventDispatcher} from "svelte";
 
     let currentType = CardType.Punishment;
     let userCards: Card[] = [];
+
+    const dispatch = createEventDispatcher();
 
     function addCard(e: any) {
         console.log(e.detail);
@@ -14,6 +17,7 @@
         // Trigger change detection
         userCards = userCards;
         currentType = undefined;
+        dispatch('created', newCard)
     }
 </script>
 

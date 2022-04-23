@@ -1,6 +1,4 @@
 <script lang="ts">
-    import {createEventDispatcher} from "svelte";
-    import {Card, CardType} from "./model/card";
     import {Punishment, PunishmentCondition} from "src/model/punishment";
 
     export let punishment: Punishment;
@@ -9,13 +7,10 @@
         switch (punishment) {
             case PunishmentCondition.AllVotes:
                 return "Don't be that funny.";
-                break;
             case PunishmentCondition.SameScore:
                 return "Shared sorrow is double sorrow.";
-                break;
             case PunishmentCondition.LastToVote:
                 return "Pick faster next time.";
-                break;
         }
     }
 </script>
@@ -23,13 +18,13 @@
 <div class="col">
     <div class="card text-center">
         <div class="card-header punishment">
-            {#if punishment.condition === 0}Hidden{/if}Punishment
+            {#if punishment.condition !== 0}Hidden{/if}Punishment
         </div>
         <div class="card-body">
             {#if punishment.targets.length}
                 <h5 class="card-title text-dark">
                     {punishment.targets.map((player) => player.name).join(', ')}
-                    {#if punishment.targets.length == 1} <br> has to
+                    {#if punishment.targets.length === 1} <br> has to
                     {:else} <br> have to
                     {/if}
                 </h5>
@@ -46,22 +41,6 @@
 
     </div>
 </div>
-
-{#if punishment.targets.length}
-
-{:else}
-    <h1>|
-        {#each punishment.targets as target}
-            {target.name}|
-        {/each}
-        {#if punishment.targets.length == 1} has to
-        {:else} have to
-        {/if}
-    </h1>
-    <h1>
-
-    </h1>
-{/if}
 
 <style lang="scss">
   .card {

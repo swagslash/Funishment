@@ -14,11 +14,11 @@
   .question {
     h1 {
       font-size: 48pt;
+      font-family: Neucha, -apple-system, system-ui, BlinkMacSystemFont,
+      "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
     padding: 2em 0;
-    font-family: Neucha, -apple-system, system-ui, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 
 </style>

@@ -21,7 +21,8 @@
         {/if}
 
         {#if game}
-            <GameBoard game={game}
+            <GameBoard socket={socket}
+                       game={game}
                        userId={userId}
                        players={room?.players ?? []}/>
         {:else}
@@ -122,20 +123,11 @@
 
     import PlayerList from './PlayerList.svelte';
     import LoginForm from './LoginForm.svelte';
-    import CardComponent from './CardComponent.svelte';
-    import QuestionComponent from './QuestionComponent.svelte';
 
     import GameBoard from "./GameBoard.svelte";
     import {GameState} from './model/game-state';
     import {Room} from './model/room';
-    import {Card, CardType} from './model/card';
-    import {Question} from './model/question';
-    import EditableCardComponent from "src/EditableCardComponent.svelte";
-    import {CardType} from "src/model/card";
-    import {Player} from "src/model/player";
-    import VotingComponent from "src/VotingComponent.svelte";
     import KitchenSink from "./KitchenSink.svelte";
-    import HandCards from "src/HandCards.svelte";
 
     let game: GameState;
     let userId: string;
@@ -145,7 +137,7 @@
     let roomNotFound: boolean = false;
     let startGameDisabled: boolean = false;
 
-    const kitchenSinkEnabled = true; // TODO set to false to game to work, ONLY USED FOR DEBGUGING COMPONENTS
+    const kitchenSinkEnabled = false; // TODO set to false to game to work, ONLY USED FOR DEBGUGING COMPONENTS
 
     // const socket = io('http://164.90.213.85:3000/');
     const socket = io('http://localhost:3000');
@@ -200,7 +192,8 @@
     });
 
     socket.on('update', (_game: GameState) => {
-        console.log("update received")
+        console.log("update received");
+        console.log( JSON.stringify(_game));
         game = _game;
     });
 
@@ -215,7 +208,7 @@
         hostStartGame();
     }
 
-    function handleVoting(e:any) {
+    function handleVoting(e: any) {
         console.log(e.detail.id);
     }
 </script>

@@ -10,18 +10,13 @@
 
     let votable = true;
 
-    function handleVoting(e: any) {
-        votable = false;
-        dispatch('votingComplete', {id: e.detail.id})
-    }
-
 </script>
 
 <div class="justify-content-center">
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">
         {#each cards as playedCard}
             <CardComponent card={playedCard.card} dealer={playedCard.dealer} currentPlayerId={currentPlayerId}
-                           votable={votable} on:voted={handleVoting}></CardComponent>
+                           votable={votable} on:voted></CardComponent>
         {/each}
     </div>
 

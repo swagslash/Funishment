@@ -9,11 +9,14 @@
     import CardCreatorComponent from "./CardCreatorComponent.svelte";
     import CardPresenter from "./CardPresenter.svelte";
     import ScoreList from "./ScoreList.svelte";
-    import VotingResultComponent from "src/VotingResultComponent.svelte";
-    import HandCards from "src/HandCards.svelte";
+    import VotingResultComponent from "./VotingResultComponent.svelte";
+    import HandCards from "./HandCards.svelte";
+    import {Socket} from "socket.io-client";
+    import QuestionComponent from "./QuestionComponent.svelte";
 
     const dispatch = createEventDispatcher();
 
+    export let socket: Socket;
     export let game: GameState;
     export let userId: string;
     export let players: Player[];
@@ -26,6 +29,26 @@
         }
         return [];
     }
+
+    function sendPunishment(e: any) {
+        socket.emit('createPunishment', e.detail.text)
+        console.log("Emit createPunishment to server " + e.detail.text)
+    }
+
+    function sendPunishmentVote(e: any) {
+        socket.emit('votePunishment', e.detail.id)
+        console.log("Emit votePunishment to server " + e.detail.id)
+    }
+
+    function sendCardsCreated(e: any) {
+        socket.emit('createCards', e.detail.userCards)
+        console.log("Emit createCards to server " + e.detail.userCards)
+    }
+
+    function sendPlayedCard(e: any) {
+        socket.emit('selectCard', e.detail.id)
+        console.log("Emit selectCard to server " + e.detail.id)
+    }
 </script>
 
 <main class="px-3">
@@ -33,19 +56,19 @@
     <div id="game">
         {#if game.phase === GamePhase.PunishmentCreation}
             <h1>PunishmentCreation</h1>
-            <PunishmentCreatorComponent></PunishmentCreatorComponent>
+            <PunishmentCreatorComponent on:created={sendPunishment}></PunishmentCreatorComponent>
         {:else if game.phase === GamePhase.PunishmentVoting}
             <h1>PunishmentVoting</h1>
-            <VotingComponent cards={game.playedCards.map((pc) => pc.card)}></VotingComponent>
+            <VotingComponent cards={game.playedCards} on:voted={sendPunishmentVote}></VotingComponent>
         {:else if game.phase === GamePhase.CardCreation}
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
-            <CardCreatorComponent></CardCreatorComponent>
+            <CardCreatorComponent on:created={sendCardsCreated}></CardCreatorComponent>
         {:else if game.phase === GamePhase.CardPlacement}
-            <HandCards cards={getMyHand()}></HandCards>
-            <!-- TODO implement hand with cards (game.playerState find with id) -->
+            <QuestionComponent question={game.question}></QuestionComponent>
+            <HandCards canPlay={true} cards={getMyHand()} on:play={sendPlayedCard}></HandCards>
         {:else if game.phase === GamePhase.CardVoting}
-            <CardPresenter currentPlayerId={userId} cards={game.playedCards.map((pc) => pc.card)}></CardPresenter>
-            <!-- TODO card to playablecard everywhere -->
+            <CardPresenter currentPlayerId={userId} playedCards={game.playedCards}></CardPresenter>
+            <HandCards canPlay={false} cards={getMyHand()}></HandCards>
         {:else if game.phase === GamePhase.CardResults}
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
             <VotingResultComponent currentPlayerId={userId} playedCards={game.playedCards}></VotingResultComponent>
