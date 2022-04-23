@@ -16,7 +16,7 @@
         CardType.Place,
     ];
 
-    export let punishment: Card;
+    export let card: Card;
 
     let index = 0;
     let currentType = requestedTypes[index];
@@ -39,7 +39,7 @@
     }
 </script>
 
-<!--<PunishmentDisplayComponent punishment="{punishment}"></PunishmentDisplayComponent>-->
+<PunishmentDisplayComponent card="{card}"></PunishmentDisplayComponent>
 
 {#if currentType}
     <h2>Add your own answer cards</h2>

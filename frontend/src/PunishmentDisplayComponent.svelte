@@ -3,8 +3,11 @@
     import {fade} from 'svelte/transition';
     import CardComponent from "src/CardComponent.svelte";
     import {Punishment} from "src/model/punishment";
+    import PunishmentComponent from "src/PunishmentComponent.svelte";
+    import {Card} from "src/model/card";
 
     export let punishment: Punishment;
+    export let card: Card;
     export let duration: number = 0;
     export let animationDuration = 2000;
 
@@ -24,8 +27,13 @@
 
 {#if !finishedInterval}
     <div out:fade="{{ duration: animationDuration }}">
-        <h1>The Looming Punishment is</h1>
-        <CardComponent card="{punishment.card}" showType showAuthor></CardComponent>
+        {#if !punishment}
+            <h1>The Looming Punishment is</h1>
+            <CardComponent card="{card}" showType showAuthor=""></CardComponent>
+        {:else}
+            <PunishmentComponent punishment="{punishment}"></PunishmentComponent>
+        {/if}
+
     </div>
 {/if}
 
