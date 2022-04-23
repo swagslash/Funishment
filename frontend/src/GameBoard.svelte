@@ -9,12 +9,23 @@
     import CardCreatorComponent from "./CardCreatorComponent.svelte";
     import CardPresenter from "./CardPresenter.svelte";
     import ScoreList from "./ScoreList.svelte";
+    import VotingResultComponent from "src/VotingResultComponent.svelte";
+    import HandCards from "src/HandCards.svelte";
 
     const dispatch = createEventDispatcher();
 
     export let game: GameState;
     export let userId: string;
     export let players: Player[];
+
+    function getMyHand() {
+        for (const playerState of game.playerState) {
+            if (playerState.player.id === userId) {
+                return playerState.hand;
+            }
+        }
+        return [];
+    }
 </script>
 
 <main class="px-3">
@@ -30,14 +41,16 @@
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
             <CardCreatorComponent></CardCreatorComponent>
         {:else if game.phase === GamePhase.CardPlacement}
+            <HandCards cards={getMyHand()}></HandCards>
             <!-- TODO implement hand with cards (game.playerState find with id) -->
         {:else if game.phase === GamePhase.CardVoting}
             <CardPresenter currentPlayerId={userId} cards={game.playedCards.map((pc) => pc.card)}></CardPresenter>
             <!-- TODO card to playablecard everywhere -->
         {:else if game.phase === GamePhase.CardResults}
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
+            <VotingResultComponent currentPlayerId={userId} playedCards={game.playedCards}></VotingResultComponent>
             <ScoreList scores={game.playerState}></ScoreList>
-            <!-- TODO scores needs to take playerState[] -->
+            <!-- TODO add continue button for host -->
         {:else if game.phase === GamePhase.Scoreboard}
             <!-- endgame -->
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>

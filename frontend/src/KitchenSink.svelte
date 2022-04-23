@@ -71,7 +71,7 @@
 <CardPresenter animationDuration={100} slideTime={200} currentPlayerId="2" playedCards="{playedCards}"></CardPresenter>
 <CardCreatorComponent punishment="{examplePunishment}"></CardCreatorComponent>
 <PunishmentCreatorComponent></PunishmentCreatorComponent>
-<HandCards canPlay={true} playerCards={cards}></HandCards>
+<HandCards canPlay={true} cards={cards}></HandCards>
 <!--<div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">-->
 <!--    <CardComponent text="Your momma" card="{exampleCard}"></CardComponent>-->
 <!--    <CardComponent text="Your momma" isWinner score="{5}" card="{exampleCard}"></CardComponent>-->
