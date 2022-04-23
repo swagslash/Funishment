@@ -63,7 +63,7 @@
     </div>
     {#if votable}
       <div class="card-footer text-muted">
-        <a href="#" on:click={onVote} class="card-link">🔥 Vote</a>
+        <button on:click={onVote} class="btn btn-outline-secondary">🔥 Vote</button>
       </div>
     {/if}
   </div>

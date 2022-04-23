@@ -7,7 +7,6 @@
     const dispatch = createEventDispatcher();
 
     export let cards: Card[];
-    export let question: Question;
 
     let votable = true;
 

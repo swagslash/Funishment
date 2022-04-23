@@ -3,6 +3,7 @@
     import {Card} from "src/model/card";
     import {onMount} from "svelte";
     import {fade, fly} from 'svelte/transition';
+    import VotingComponent from "src/VotingComponent";
 
     export let cards: Card[];
     export let animationDuration: number = 2000;
@@ -29,7 +30,9 @@
 
             index++;
             if (index >= cards.length) {
-                finishedSlideshow = true;
+                setTimeout(() => {
+                    finishedSlideshow = true;
+                }, animationDuration);
                 return;
             }
             card = cards[index];
@@ -47,10 +50,18 @@
             clearInterval(interval);
         };
     });
+
+    function handleVoting(e: any) {
+        console.log(e.detail.id);
+    }
 </script>
 
-{#if !finishedSlideshow}
-    <div style="height: 150px; width: auto" out:fade="{{ duration: animationDuration }}">
+{#if finishedSlideshow}
+    <div>
+        <VotingComponent cards="{cards}" on:votingComplete={handleVoting}></VotingComponent>
+    </div>
+{:else}
+    <div >
         {#if index % 2 === 0 && visibleFirst}
             <div class="presented" in:fly="{{ x: +200, duration: animationDuration }}"
                  out:fly="{{ x: -200, duration: animationDuration }}">
@@ -63,16 +74,13 @@
             </div>
         {/if}
     </div>
-{:else}
-    <div>
-        <code>VotingComponent Placeholder</code>
-    </div>
 {/if}
 
 <style>
     CardComponent {
 
     }
+
     .presented {
         position: relative;
         top: 0;
