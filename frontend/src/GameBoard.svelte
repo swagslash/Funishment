@@ -2,12 +2,13 @@
     import {GamePhase, GameState} from './model/game-state';
     import {Player} from './model/player';
     import {createEventDispatcher} from 'svelte';
-    import PunishmentCreatorComponent from "src/PunishmentCreatorComponent.svelte";
-    import VotingComponent from "src/VotingComponent.svelte";
-    import PunishmentDisplayComponent from "src/PunishmentDisplayComponent.svelte";
-    import CardCreatorComponent from "src/CardCreatorComponent.svelte";
-    import CardPresenter from "src/CardPresenter.svelte";
-    import ScoreList from "src/ScoreList.svelte";
+
+    import PunishmentCreatorComponent from "./PunishmentCreatorComponent.svelte";
+    import VotingComponent from "./VotingComponent.svelte";
+    import PunishmentDisplayComponent from "./PunishmentDisplayComponent.svelte";
+    import CardCreatorComponent from "./CardCreatorComponent.svelte";
+    import CardPresenter from "./CardPresenter.svelte";
+    import ScoreList from "./ScoreList.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -35,13 +36,13 @@
             <!-- TODO card to playablecard everywhere -->
         {:else if game.phase === GamePhase.CardResults}
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
-            <ScoreList scores={game.playerState}>
+            <ScoreList scores={game.playerState}></ScoreList>
             <!-- TODO scores needs to take playerState[] -->
         {:else if game.phase === GamePhase.Scoreboard}
             <!-- endgame -->
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
-            <ScoreList scores={game.playerState}>
-                <!-- TODO scores needs to take playerState[] -->
+            <ScoreList scores={game.playerState}></ScoreList>
+            <!-- TODO scores needs to take playerState -->
         {:else}
             <h1>Missing implementation for view of {game.phase}</h1>
         {/if}
