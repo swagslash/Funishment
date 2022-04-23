@@ -4,7 +4,6 @@
 
   const dispatch = createEventDispatcher();
 
-  export let text: string;
   export let card: Card;
 
   export let playable = false;
@@ -53,7 +52,7 @@
     <div class="card-body">
       <h5 class="card-title text-dark" class:presenterTheme>{card.text}</h5>
       {#if showAuthor}<p class="card-text">
-          <small class="text-muted">by {card.author}</small>
+          <small class="text-muted">by {card.author.name}</small>
         </p>{/if}
         {#if votedFor}<p class="card-text">
           <small class="text-muted">You voted for this.</small>

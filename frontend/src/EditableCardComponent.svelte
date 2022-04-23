@@ -32,6 +32,7 @@
     function onSubmit() {
         console.log("created card with text " + userInput);
         dispatch("cardCreated", { type: cardType, text: userInput, player: currentPlayer });
+        userInput = '';
     }
 </script>
 
@@ -45,12 +46,17 @@
                    placeholder="{getRandomExample(cardType)}"></textarea>
         </div>
             <div class="card-footer text-muted">
-                <a href="#" on:click={onSubmit} class="card-link">Submit</a>
+                <a on:click={onSubmit} class="card-link btn btn-outline-primary">Submit</a>
             </div>
     </div>
 </div>
 
 <style lang="scss">
+
+    a {
+      cursor: pointer;
+    }
+
     .card {
         position: relative;
         top: 0;
