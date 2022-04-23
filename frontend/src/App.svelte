@@ -15,12 +15,12 @@
             </div>
         </header>
         <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">
-                    <CardComponent text="Your momma" score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" isWinner score="{5}" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
-                    <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
+                    <CardComponent text="Your momma" votedFor score="{5}" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
                     <CardComponent text="Your momma" votable score="{5}" card="{exampleCard}"></CardComponent>
