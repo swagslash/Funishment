@@ -20,6 +20,7 @@
     [CardType.Activity, "Activity"],
     [CardType.Person, "Person"],
     [CardType.Place, "Place"],
+    [CardType.Punishment, "Punishment"],
   ]);
 
   function onVote() {
@@ -46,6 +47,7 @@
            class:person={card.type === CardType.Person}
            class:place={card.type === CardType.Place}
            class:activity={card.type === CardType.Activity}
+           class:punishment={card.type === CardType.Punishment}
       >
         {typeToStringMap.get(card.type)}
       </div>
@@ -117,6 +119,11 @@
 
   .place {
     background-color: #198754;
+    color: white;
+  }
+
+  .punishment {
+    background-color: #dc3545;
     color: white;
   }
 

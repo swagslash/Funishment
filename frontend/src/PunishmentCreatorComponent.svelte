@@ -17,14 +17,17 @@
     }
 </script>
 
-<div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-1">
+{#if currentType}
+    <h2>Finish this sentence</h2>
+    <h3>The unlucky player has to ...</h3>
+    <EditableCardComponent cardType="{currentType}" on:cardCreated={addCard}></EditableCardComponent>
+    {:else}
+    <h2>Waiting for other players to finish their punishments.</h2>
+    <p>While you wait, you can think about the consequences if you lose and have to.</p>
+{/if}
+<div class="row row-cols-1 g-10">
     {#each userCards as card}
         <CardComponent card="{card}" showType showAuthor></CardComponent>
     {/each}
 </div>
-{#if currentType}
-    <EditableCardComponent cardType="{currentType}" on:cardCreated={addCard}></EditableCardComponent>
-    {:else}
-    <h2>Waiting for other players to finish their answers.</h2>
-    <p>You can admire your answers for now and lough at how funny you are.</p>
-{/if}
+

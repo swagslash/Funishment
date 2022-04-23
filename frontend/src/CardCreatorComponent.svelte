@@ -37,8 +37,10 @@
 </script>
 
 {#if currentType}
+    <h2>Add your own answer cards</h2>
+    <h3>They will be distributed to players after everybody is done.</h3>
     <EditableCardComponent cardType="{currentType}" on:cardCreated={addCard}></EditableCardComponent>
-    {:else}
+{:else}
     <h2>Waiting for other players to finish their answers.</h2>
     <p>You can admire your answers for now and lough at how funny you are.</p>
 {/if}
