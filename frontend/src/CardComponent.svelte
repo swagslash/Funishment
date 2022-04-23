@@ -7,6 +7,7 @@
   export let card: Card;
 
   export let playable = false;
+  export let played = false;
   export let showAuthor = false;
   export let showType = false;
   export let votable = false;
@@ -28,10 +29,20 @@
     votedFor = true;
     dispatch("voted", { id: card.id });
   }
+
+  function onSelected() {
+    if (playable) {
+      console.log("played " + card.id);
+      played = true;
+      playable = false;
+      dispatch("play", {id: card.id});
+    }
+  }
 </script>
 
 <div class="col">
-  <div class="card text-center" class:playable class:votedFor class:isWinner class:presenterTheme>
+  <div class="card text-center" class:playable class:votedFor class:isWinner class:presenterTheme class:played
+       on:click={onSelected}>
     {#if score}
       <div
         class="card-header"
@@ -60,6 +71,9 @@
         {#if votedFor}<p class="card-text">
           <small class="text-muted">You voted for this.</small>
         </p>{/if}
+      {#if played}<p class="card-text">
+        <small class="text-muted">You played this.</small>
+      </p>{/if}
     </div>
     {#if votable}
       <div class="card-footer text-muted">
@@ -81,6 +95,10 @@
 
   .votedFor {
     box-shadow: 0px 0px 25px rgba(84, 245, 51, 0.795);
+  }
+
+  .played {
+    box-shadow: 0px 0px 25px rgba(51, 129, 245, 0.79);
   }
 
   .isWinner {

@@ -39,7 +39,7 @@
     }
 </script>
 
-<PunishmentDisplayComponent punishment="{punishment}"></PunishmentDisplayComponent>
+<!--<PunishmentDisplayComponent punishment="{punishment}"></PunishmentDisplayComponent>-->
 
 {#if currentType}
     <h2>Add your own answer cards</h2>

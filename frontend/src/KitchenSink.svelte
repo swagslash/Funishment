@@ -7,6 +7,7 @@
     import CardCreatorComponent from "src/CardCreatorComponent.svelte";
     import PunishmentCreatorComponent from "src/PunishmentCreatorComponent";
     import {Punishment, PunishmentCondition} from "src/model/punishment";
+    import HandCards from "src/HandCards.svelte";
 
     let examplePlayer: Player = {id: '1', name: 'W8D7'};
     let exampleCard: Card = {
@@ -58,6 +59,7 @@
 <CardPresenter cards="{cards}"></CardPresenter>
 <CardCreatorComponent punishment="{examplePunishment}"></CardCreatorComponent>
 <PunishmentCreatorComponent></PunishmentCreatorComponent>
+<HandCards canPlay={true} playerCards={cards}></HandCards>
 <!--<div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">-->
 <!--    <CardComponent text="Your momma" card="{exampleCard}"></CardComponent>-->
 <!--    <CardComponent text="Your momma" isWinner score="{5}" card="{exampleCard}"></CardComponent>-->
