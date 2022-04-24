@@ -139,7 +139,6 @@ io.on('connection', (socket) => {
     socket.emit('update', internalState.gameState);
     socket.to(room.id)
         .emit('update', internalState.gameState);
-
   });
 
   socket.on('createPunishment', (punishmentText: string) => {
