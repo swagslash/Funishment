@@ -7,7 +7,7 @@
                     <span class="nav-link" title={userId}>
                         {#if username}<span title={userId}>{username}</span>{/if}
                         {#if room}
-                            {#if username === room.host.name} hosting lobby{:else} playing in lobby{/if} <b
+                            {#if userId === room.host.id} hosting lobby{:else} playing in lobby{/if} <b
                                 class="text-white">{room.id}</b>
                         {/if}
                     </span>
@@ -31,7 +31,7 @@
                 <div id="chat-container">
                     <PlayerList room={room} players={room.players} lobbyId={room.id} myUserId={userId}/>
                     <br>
-                    {#if username === room.host.name}
+                    {#if userId === room.host.id}
                         <p>You are hosting this lobby.</p>
                         {#if room.players.length < 2}
                             <p>⏳ Wait for more players to start the game. ⏳</p>
