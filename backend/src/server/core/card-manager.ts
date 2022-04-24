@@ -6,6 +6,9 @@ import { InternalState } from './state';
 const CARD_MANAGER_LOG_PREFIX = 'card-manager';
 const MAX_PLAYER_CARDS = 12;
 
+export const CATEGORY_COUNT = 4;
+export const CARDS_PER_CATEGORY = 2;
+
 /**
  * Assign card metadata: card id and author
  * @param card
@@ -76,6 +79,29 @@ export const createNewPlayerCard = (text: string, type: CardType): Card => {
     text,
     type,
   };
+};
+
+const refillForCardForType = (type: CardType, pool: Card[], state: InternalState): void => {
+  const cards = pool.filter((c) => c.type === type);
+  const predefined = state.predefinedCards.filter((p) => p.type === type);
+
+  for (let i = 0; i < CARDS_PER_CATEGORY - cards.length; i++) {
+    const index = Math.floor(Math.random() * predefined.length);
+    const card = {
+      ...predefined[index],
+    };
+
+    assignCardMetadata(card, undefined, state);
+
+    pool.push(card);
+  }
+};
+
+export const refillWithPredefinedCards = (pool: Card[], state: InternalState): void => {
+  refillForCardForType(CardType.Person, pool, state);
+  refillForCardForType(CardType.Object, pool, state);
+  refillForCardForType(CardType.Place, pool, state);
+  refillForCardForType(CardType.Activity, pool, state);
 };
 
 export const generatePlayerCards = (state: InternalState): Card[] => {

@@ -9,14 +9,14 @@ import { PunishmentCondition } from './model/punishment';
 import { Room } from './model/room';
 import {
   addCard,
-  assignCardMetadata,
+  assignCardMetadata, CARDS_PER_CATEGORY, CATEGORY_COUNT,
   createNewPlayerCard,
   createNewPunishmentCard,
   generatePlayerCards,
   getCardVotingScore,
   getTopMostCards,
   handoutCards,
-  refillHand,
+  refillHand, refillWithPredefinedCards,
   removeCardFromHand,
   voteForCard,
 } from './server/core/card-manager';
@@ -47,8 +47,6 @@ const PUNISHMENT_LOG_PREFIX = 'punishment';
 const CARDS_LOG_PREFIX = 'cards';
 const ROUND_LOG_PREFIX = 'round';
 
-const CATEGORY_COUNT = 4;
-const CARDS_PER_CATEGORY = 2;
 const ROUNDS_TO_PLAY = 5;
 
 const app = express();
@@ -220,20 +218,16 @@ io.on('connection', (socket) => {
       return;
     }
 
-    for (let i = 0; i < CARDS_PER_CATEGORY * CATEGORY_COUNT; i++) {
-      let card: Card;
-      if (cards.length > i) {
-        card = createNewPlayerCard(cards[i].text, cards[i].type);
-        assignCardMetadata(card, player, internalState);
-      } else {
-        // Skipped cards
-        const index = Math.floor(Math.random() * internalState.predefinedCards.length);
-        card = internalState.predefinedCards[index];
-        assignCardMetadata(card, undefined, internalState);
-      }
-
-      internalState.cardPool.push(card);
+    const intermediatePool: Card[] = [];
+    for (const {type, text} of cards) {
+      const card = createNewPlayerCard(text, type);
+      assignCardMetadata(card, player, internalState);
+      intermediatePool.push(card);
     }
+
+    refillWithPredefinedCards(intermediatePool, internalState);
+
+    internalState.cardPool.push(...intermediatePool);
 
     // All players created cards => proceed to card placement
     if (internalState.cardPool.length === room.players.length * CARDS_PER_CATEGORY * CATEGORY_COUNT) {
@@ -243,6 +237,8 @@ io.on('connection', (socket) => {
 
       // Load predefined cards and questions
       internalState.questions = loadQuestions(room.nsfw, internalState.cardPool, internalState.predefinedCards);
+
+      npmlog.info('lafjldksa', 'hand out cards', internalState.cardPool);
 
       handoutCards(internalState);
 
