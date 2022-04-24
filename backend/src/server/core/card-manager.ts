@@ -131,12 +131,12 @@ export const refillHand = (state: InternalState): void => {
   const {predefinedCards, gameState} = state;
   const {playerState} = gameState;
 
-  for (const {player, hand} of playerState) {
+  for (const {hand} of playerState) {
     while (hand.length < MAX_PLAYER_CARDS) {
       const index = Math.floor(Math.random() * predefinedCards.length);
       const newCard = predefinedCards.splice(index, 1)[0];
 
-      assignCardMetadata(newCard, player, state);
+      assignCardMetadata(newCard, undefined, state);
 
       hand.push(newCard);
     }
