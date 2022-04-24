@@ -1,7 +1,6 @@
 <script lang="ts">
     import {GamePhase, GameState} from './model/game-state';
     import {Player} from './model/player';
-    import {createEventDispatcher} from 'svelte';
 
     import PunishmentCreatorComponent from "./PunishmentCreatorComponent.svelte";
     import VotingComponent from "./VotingComponent.svelte";
@@ -80,26 +79,30 @@
         {:else if game.phase === GamePhase.CardCreation}
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
             <CardCreatorComponent on:created={sendCardsCreated}></CardCreatorComponent>
-        {:else if game.phase === GamePhase.CardPlacement}
+        {:else if game.phase === GamePhase.CardPlacement
+        || game.phase === GamePhase.CardVoting
+        || game.phase === GamePhase.CardResults}
             <QuestionComponent question={game.question}></QuestionComponent>
-            <HandCards canPlay={true} cards={getMyHand()} on:play={sendPlayedCard}></HandCards>
-        {:else if game.phase === GamePhase.CardVoting}
-            <QuestionComponent question={game.question}></QuestionComponent>
-            <CardPresenter currentPlayerId={userId} playedCards={game.playedCards} on:voted={sendVotes}></CardPresenter>
-        {:else if game.phase === GamePhase.CardResults}
-            <QuestionComponent question={game.question}></QuestionComponent>
-            <VotingResultComponent currentPlayerId={userId} playedCards={game.playedCards}></VotingResultComponent>
 
-            <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
+            {#if game.phase === GamePhase.CardPlacement}
+                <HandCards canPlay={true} cards={getMyHand()} on:play={sendPlayedCard}></HandCards>
+            {:else if game.phase === GamePhase.CardVoting}
+                <CardPresenter currentPlayerId={userId} playedCards={game.playedCards}
+                               on:voted={sendVotes}></CardPresenter>
+            {:else if game.phase === GamePhase.CardResults}
+                <VotingResultComponent currentPlayerId={userId} playedCards={game.playedCards}></VotingResultComponent>
+                <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
 
-            {#if isHost}
-                <button class="btn btn-primary" on:click={sendNextRound}>Next round</button>
+                {#if isHost}
+                    <button class="btn btn-primary" on:click={sendNextRound}>Next round</button>
+                {/if}
             {/if}
         {:else if game.phase === GamePhase.Scoreboard}
             <!-- endgame -->
-            <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
             <ScoreList playerStates={game.playerState}></ScoreList>
-            <!-- TODO scores needs to take playerState -->
+            <div style="padding: 0 10px">
+                <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
+            </div>
             {#if isHost}
                 <button class="btn btn-primary" on:click={continuePlaying}>New game with same players</button>
             {/if}

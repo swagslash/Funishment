@@ -145,9 +145,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    if (!internalState) {
-      internalState = getInternalState(room.id);
-    }
+    internalState = getInternalState(room.id);
 
     if (internalState.gameState.phase !== GamePhase.PunishmentCreation) {
       npmlog.warn(PUNISHMENT_LOG_PREFIX, '[Creation] Invalid state: Room %s, player %s, phase: %s', room.id, player.name, internalState.gameState.phase);
@@ -354,6 +352,8 @@ io.on('connection', (socket) => {
     if (player && room) {
       removePlayer(player);
       closeRoom(room);
+
+      removeInternalState(room.id);
 
       socket.leave(room.id);
       socket.to(room.id)

@@ -6,11 +6,11 @@
     function parsePunishment(punishment) {
         switch (punishment) {
             case PunishmentCondition.AllVotes:
-                return "Don't be that funny.";
+                return "Everybody else voted for you. Don't try too hard.";
             case PunishmentCondition.SameScore:
-                return "Shared sorrow is double sorrow.";
+                return "There was a tie. Shared sorrow is double sorrow.";
             case PunishmentCondition.LastToVote:
-                return "Pick faster next time.";
+                return "You took too long for voting. Pick faster next time.";
         }
     }
 </script>
@@ -18,7 +18,7 @@
 <div class="col">
     <div class="card text-center">
         <div class="card-header punishment">
-            {#if punishment.condition !== 0}Hidden{/if}Punishment
+            {#if punishment.condition !== 0}Surprise {/if}Punishment
         </div>
         <div class="card-body">
             {#if punishment.targets.length}
@@ -28,7 +28,7 @@
                     {:else} <br> have to
                     {/if}
                 </h5>
-                <h5 class="card-title text-dark">{punishment.card.text}</h5>
+                <h5 class="card-title text-dark fw-bold">{punishment.card.text}</h5>
                 {#if punishment.condition !== 0}
                     <h5 class="card-title text-dark">{parsePunishment(punishment.condition)}</h5>
                 {/if}
