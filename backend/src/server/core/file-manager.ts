@@ -3,9 +3,12 @@ import * as npmlog from 'npmlog';
 import {Card, CardType} from "../../model/card";
 import {Question} from "../../model/question";
 
-let nextId = 0;
+const CATEGORY_COUNT = 4;
+const CARDS_PER_CATEGORY = 2;
+const MAX_EXPECTED_PLAYERS = 10;
+
+let nextId = CATEGORY_COUNT*CARDS_PER_CATEGORY*MAX_EXPECTED_PLAYERS;
 let nextCardId = () => nextId++;
-const PROB_USER_CARD_FILLS_QUESTION = .8;
 
 /**
  * Loads all the string lines from the file path.
@@ -148,11 +151,7 @@ export const parseQuestionText = (questionText: string, userCards: Card[], prede
         const rawPlaceholder: string = placeholder[0];
         let placeholderOptions: string[] = rawPlaceholder.slice(1, -1).split('|');
 
-        if (Math.random() < PROB_USER_CARD_FILLS_QUESTION) {
-            replacementCards.push(getCardForTypePlaceholder(placeholderOptions, userCards, replacementCards))
-        } else {
-            replacementCards.push(getCardForTypePlaceholder(placeholderOptions, predefinedCards, replacementCards))
-        }
+        replacementCards.push(getCardForTypePlaceholder(placeholderOptions, userCards.concat(predefinedCards), replacementCards))
     });
 
     // replace placeholders by cards
