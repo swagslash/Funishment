@@ -214,3 +214,6 @@ dist
 /.idea/
 
 package-lock.json
+
+# Build app
+build
