@@ -20,7 +20,7 @@ Today {Player|Object|Place|Activity}. Tomorrow {_}.
 What can't {Player|Person} get enough of?
 Who is saved as "Honeybunny" in {Player}'s phone?
 What's {Player|Person}'s favourite activity?
-{Player|Person} is hungry. What do you feed him/her?
+{Player|Person} is hungry. What do you feed them?
 {_} is not a real thing. It can't hurt you.
 Yet another success in {Player|Person}'s life. And it was all thanks to {_}.
 Finally, I did it! I created {_}!
@@ -41,6 +41,6 @@ What is {Player|Person}'s biggest fear?
 What is {Player|Person}'s proudest possession?
 {_} is the new {Activity|Object}.
 Who is {Player|Person}'s secret lover?
-If {Player}'s house is on fire what will be the first thing he/she would grab?
+If {Player}'s house is on fire what will be the first thing they would grab?
 Don't look! Here comes {Player} with {_}.
 They don't call {Player} {_} without a reason.
