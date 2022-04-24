@@ -29,3 +29,4 @@ Who would love to live {Place}?
 What does {Player|Person} secretly have on their phone?
 {Person|Player} is a hunter. What is their prey?
 What does {Player|Person} spend their free time on?
+What is {Player|Person} famous for?
