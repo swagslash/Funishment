@@ -25,3 +25,4 @@ What is Hitler's biggest fear?
 Who is {Player}'s secret lover?
 What is {Player}'s new favourite forplay activity?
 {Player} is turned on by {Activity}. What turns {Player} on?
+{Player} is in prison. What did they do?
