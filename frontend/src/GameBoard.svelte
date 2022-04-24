@@ -97,7 +97,7 @@
                 {#if isHost}
                     <button class="btn btn-primary" on:click={sendNextRound}>Next round</button>
                 {:else}
-                    <p class="text-white">Waiting for host to advance round.</p>
+                    <p class="text-white">⌛ Waiting for host to advance round. ⌛</p>
                 {/if}
             {/if}
         {:else if game.phase === GamePhase.Scoreboard}
@@ -111,7 +111,7 @@
             {/if}
             <button class="btn btn-outline-danger" on:click={disconnect}>Disconnect</button>
         {:else}
-            <h1>Missing implementation for view of {game.phase}</h1>
+            <h1>FATAL: Missing implementation for view of {game.phase}</h1>
         {/if}
     </div>
 </main>

@@ -23,6 +23,7 @@
                            votable={votable} on:voted={vote}></CardComponent>
         {/each}
     </div>
+    {#if !votable}<div>⌛ Waiting for other players to finish voting. ⌛</div>{/if}
 
 </div>
 
