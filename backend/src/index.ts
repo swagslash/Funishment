@@ -238,8 +238,6 @@ io.on('connection', (socket) => {
       // Load predefined cards and questions
       internalState.questions = loadQuestions(room.nsfw, internalState.cardPool, internalState.predefinedCards);
 
-      npmlog.info('lafjldksa', 'hand out cards', internalState.cardPool);
-
       handoutCards(internalState);
 
       internalState.gameState.appliedPunishment = undefined;
