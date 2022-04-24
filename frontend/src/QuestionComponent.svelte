@@ -13,7 +13,7 @@
 <style lang="scss">
   .question {
     h1 {
-      font-size: 48pt;
+      font-size: 36pt;
       font-family: Neucha, -apple-system, system-ui, BlinkMacSystemFont,
       "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }

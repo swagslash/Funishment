@@ -19,6 +19,6 @@
     now!</p>
 <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">
     {#each cards as card}
-        <CardComponent playable={canPlay} card="{card}" showType on:play={submitPlayedCard}></CardComponent>
+        <CardComponent playable={canPlay} card="{card}" on:play={submitPlayedCard}></CardComponent>
     {/each}
 </div>

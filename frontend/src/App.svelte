@@ -183,7 +183,7 @@
     });
 
     socket.on('roomClosed', (_player: Player) => {
-        alert("Room got closed, because " + _player.name + " disconnected.")
+        alert("Room got closed, because " + _player.name + " disconnected. Please create a new lobby.")
         reset();
     });
 
