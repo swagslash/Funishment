@@ -20,5 +20,8 @@ Where would you hide a corpse (asking for a friend)?
 How to seduce {Person} (asking for a friend)?
 How to seduce {Player}?
 Where does {Player} end up after a night out drinking?
-What is licking on your balls?
+Who is licking your balls?
 What is Hitler's biggest fear?
+Who is {Player}'s secret lover?
+What is {Player}'s new favourite forplay activity?
+{Player} is turned on by {Activity}. What turns {Player} on?
