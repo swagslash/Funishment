@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as http from 'http';
 import * as npmlog from 'npmlog';
 import { Server } from 'socket.io';
-import { CardType } from './model/card';
+import { Card, CardType } from './model/card';
 import { GamePhase } from './model/game-state';
 import { Player } from './model/player';
 import { PunishmentCondition } from './model/punishment';
@@ -133,6 +133,7 @@ io.on('connection', (socket) => {
 
     removeInternalState(room.id);
     internalState = createInternalState(room);
+    internalState.predefinedCards = loadCardsForAllTypes(room.nsfw, room.players.map((p) => p.name), internalState);
 
     room.open = false;
 
@@ -219,9 +220,17 @@ io.on('connection', (socket) => {
       return;
     }
 
-    for (const {type, text} of cards) {
-      const card = createNewPlayerCard(text, type);
-      assignCardMetadata(card, player, internalState);
+    for (let i = 0; i < CARDS_PER_CATEGORY * CATEGORY_COUNT; i++) {
+      let card: Card;
+      if (cards.length > i) {
+        card = createNewPlayerCard(cards[i].text, cards[i].type);
+        assignCardMetadata(card, player, internalState);
+      } else {
+        // Skipped cards
+        const index = Math.floor(Math.random() * internalState.predefinedCards.length);
+        card = internalState.predefinedCards[index];
+        assignCardMetadata(card, undefined, internalState);
+      }
 
       internalState.cardPool.push(card);
     }
@@ -233,10 +242,6 @@ io.on('connection', (socket) => {
       internalState.cardPool.push(...playerCards);
 
       // Load predefined cards and questions
-      internalState.predefinedCards = [
-        ...loadCardsForAllTypes(room.nsfw, room.players.map((p) => p.name)),
-        ...playerCards,
-      ];
       internalState.questions = loadQuestions(room.nsfw, internalState.cardPool, internalState.predefinedCards);
 
       handoutCards(internalState);
