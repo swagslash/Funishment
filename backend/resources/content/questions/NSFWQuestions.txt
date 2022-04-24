@@ -26,13 +26,9 @@ What is Hitler's biggest fear?
 Who is {Player}'s secret lover?
 What is {Player}'s new favourite forplay activity?
 {Player} is turned on by {Activity}. What turns {Player} on?
-<<<<<<< HEAD
 {Player} is in prison. What did they do?
-=======
 If you were a hunter what would be your prey?
 If {Player} was a hunter what would be the prey?
 What is {Player}'s secret sex preference?
 If there is a zombie apocalypse who will die first?
 Everyone knows the black guy always dies first in a horro movie. But who will die second?
- 
->>>>>>> master
