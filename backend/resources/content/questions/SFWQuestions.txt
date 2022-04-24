@@ -8,7 +8,8 @@ What would be the perfect gift for {Player|Person}?
 How does {Player|Person} earn their living?
 What can't {Player|Person} get enough of?
 A match made in heaven: {Player|Person|Object|Place|Activity} and {_}.
-Combine {Player|Person|Object} and {Place|Activity} and you'll get {_}.
+Combine {Player|Person|Object} and {Activity|Object} and you'll get {_}.
+Merge {Object} and {Object} together and you'll get {_}.
 Capitalism finally destroyed {_}.
 {Person} or {Person}? Neither. {_}!
 {Object} or {Object}? Neither. {_}!
@@ -17,12 +18,11 @@ Capitalism finally destroyed {_}.
 Yo momma is so fat, she likes {_}.
 Today {Player|Object|Place|Activity}. Tomorrow {_}.
 {Player|Object|Place|Activity} is a gateway drug to {_}.
-What can't {Player|Person} get enough of?
-Who is saved as "Honeybunny" in {Player}'s phone?
 What's {Player|Person}'s favourite activity?
 {Player|Person} is hungry. What do you feed them?
 {_} is not a real thing. It can't hurt you.
 Yet another success in {Player|Person}'s life. And it was all thanks to {_}.
+Who or what do you find {Place}?
 Finally, I did it! I created {_}!
 Who would love to live {Place}?
 What does {Player|Person} secretly have on their phone?
