@@ -138,7 +138,7 @@ export const handoutCards = ({cardPool, gameState}: InternalState): void => {
   const playedCardIds: number[] = [];
 
   for (const {hand} of gameState.playerState) {
-    hand.push(getNewCard(CardType.Player, playedCardIds, cardPool));
+    // hand.push(getNewCard(CardType.Player, playedCardIds, cardPool));
 
     for (let i = 0; i < 2; i++) {
       hand.push(getNewCard(CardType.Person, playedCardIds, cardPool));

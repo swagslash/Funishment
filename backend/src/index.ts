@@ -233,10 +233,10 @@ io.on('connection', (socket) => {
     if (internalState.cardPool.length === room.players.length * CARDS_PER_CATEGORY * CATEGORY_COUNT) {
       npmlog.info(CARDS_LOG_PREFIX, 'All players in room %s created cards', room.id);
       const playerCards = generatePlayerCards(internalState);
-      internalState.cardPool.push(...playerCards);
+      // internalState.cardPool.push(...playerCards);
 
       // Load predefined cards and questions
-      internalState.questions = loadQuestions(room.nsfw, internalState.cardPool, internalState.predefinedCards);
+      internalState.questions = loadQuestions(room.nsfw, [...internalState.cardPool, ...playerCards], internalState.predefinedCards);
 
       handoutCards(internalState);
 
