@@ -28,6 +28,7 @@ Who would love to live {Place}?
 What does {Player|Person} secretly have on their phone?
 If {Person|Player} was a hunter what would be the prey?
 What does {Player|Person} spend their free time on?
+What is {Player|Person} famous for?
 {Object} is not an option but {_} is.
 {Activity} is nothing without {_}.
 {Person} has a secret folder full of {_}.
