@@ -1,4 +1,5 @@
 import * as npmlog from 'npmlog';
+import { PlayedCard } from '../../model/card';
 import { GamePhase, GameState } from '../../model/game-state';
 import { Player, PlayerState } from '../../model/player';
 import { Punishment, PUNISHMENT_PROBABILITIES, PunishmentCondition } from '../../model/punishment';
@@ -99,7 +100,7 @@ export const getVotedPunishment = ({votedPunishment, gameState}: InternalState):
 };
 
 export const calculateHiddenPunishment = ({hiddenPunishments, gameState}: InternalState, lastPlayer: Player): Punishment | undefined => {
-  const {playedCards, playerState, round} = gameState;
+  const {playedCards, round} = gameState;
   const probability = PUNISHMENT_PROBABILITIES[round - 1];
 
   // No punishment
@@ -118,22 +119,22 @@ export const calculateHiddenPunishment = ({hiddenPunishments, gameState}: Intern
     };
   }
 
-  // Check for same scores
-  const groupsMap = playerState.reduce((groups, current) => {
-    if (groups[current.score]) {
-      groups[current.score].push(current);
+  // Check for same votes
+  const groupsMap = playedCards.reduce((groups, current) => {
+    if (groups[current.votes]) {
+      groups[current.votes].push(current);
     } else {
-      groups[current.score] = [current];
+      groups[current.votes] = [current];
     }
 
     return groups;
-  }, {} as Record<number, PlayerState[]>);
+  }, {} as Record<number, PlayedCard[]>);
   const playersWithSameScore = Object.entries(groupsMap)
     .filter(([score]) => (+score) > 0)
     .filter(([_, ps]) => ps.length > 1)
     .map(([, ps]) => ps)
     .flat()
-    .map((ps) => ps.player);
+    .map((ps) => ps.dealer);
 
   if (playersWithSameScore.length > 0) {
     return {
