@@ -58,16 +58,24 @@
         socket.emit('voteCard', e.detail.id)
         console.log("Emit voteCard to server " + e.detail.id)
     }
+
+    function continuePlaying(e: any) {
+        socket.emit('startGame')
+        console.log("Emit startGame to server")
+    }
+
+    function disconnect(e: any) {
+        socket.disconnect()
+        console.log("Disconnected.")
+    }
 </script>
 
 <main class="px-3">
-    <h1>Game running</h1>
     <div id="game">
         {#if game.phase === GamePhase.PunishmentCreation}
-            <h1>PunishmentCreation</h1>
             <PunishmentCreatorComponent on:created={sendPunishment}></PunishmentCreatorComponent>
         {:else if game.phase === GamePhase.PunishmentVoting}
-            <h1>PunishmentVoting</h1>
+            <h2>Vote on the punishment of this game</h2>
             <VotingComponent cards={game.playedCards} on:voted={sendPunishmentVote}></VotingComponent>
         {:else if game.phase === GamePhase.CardCreation}
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
@@ -92,6 +100,10 @@
             <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
             <ScoreList playerStates={game.playerState}></ScoreList>
             <!-- TODO scores needs to take playerState -->
+            {#if isHost}
+                <button class="btn btn-primary" on:click={continuePlaying}>New game with same players</button>
+            {/if}
+            <button class="btn btn-outline-danger" on:click={disconnect}>Disconnect</button>
         {:else}
             <h1>Missing implementation for view of {game.phase}</h1>
         {/if}

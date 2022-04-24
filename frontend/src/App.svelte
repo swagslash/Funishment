@@ -7,8 +7,9 @@
                     <span class="nav-link" title={userId}>
                         {#if username}<span title={userId}>{username}</span>{/if}
                         {#if room}
-                            {#if userId === room.host.id} hosting lobby{:else} playing in lobby{/if} <b
-                                class="text-white">{room.id}</b>
+                            {#if userId === room.host.id} hosting{:else} playing in{/if}
+                            {#if room.nsfw} <span class="text-danger">NSFW</span>{/if} lobby
+                            <b class="text-white">{room.id}</b>
                         {/if}
                     </span>
                 </nav>
@@ -129,6 +130,7 @@
     import {GameState} from './model/game-state';
     import {Room} from './model/room';
     import KitchenSink from "./KitchenSink.svelte";
+    import {Player} from "src/model/player";
 
     let game: GameState;
     let userId: string;
@@ -148,16 +150,18 @@
     });
 
     socket.on('disconnected', function () {
-        userId = undefined;
-        game = undefined;
-        room = undefined;
+        reset();
     });
 
     function join(event) {
         const lobbyId = event.detail.lobbyId;
         username = event.detail.username;
+        const isNsfw = event.detail.isNsfw;
+
+        console.log(lobbyId, username, isNsfw);
+
         if (lobbyId === undefined || lobbyId === '') {
-            socket.emit('createRoom', username);
+            socket.emit('createRoom', username, isNsfw);
         } else {
             socket.emit('joinRoom', username, lobbyId);
         }
@@ -177,12 +181,13 @@
         roomNotFound = true;
     });
 
-    socket.on('roomClosed', () => {
-        room = undefined;
-        game = undefined;
+    socket.on('roomClosed', (_player: Player) => {
+        alert("Room got closed, because " + _player.name + " disconnected.")
+        reset();
     });
 
     socket.on('roomCreated', (_room: Room) => {
+        console.log(_room)
         updateRoom(_room);
         roomNotFound = false;
     });
@@ -198,7 +203,7 @@
         game = _game;
     });
 
-    function backToMain() {
+    function reset() {
         game = undefined;
         userId = undefined;
         username = undefined;

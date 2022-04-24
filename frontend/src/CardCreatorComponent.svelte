@@ -43,9 +43,6 @@
     }
 </script>
 
-<!--TODO-->
-<!--<PunishmentDisplayComponent card="{card}"></PunishmentDisplayComponent>-->
-
 {#if currentType}
     <h2>Add your own answer cards</h2>
     <h3>They will be distributed to players after everybody is done.</h3>
