@@ -1,16 +1,4 @@
-{Player}'s car
-a banana
-two pints of lager
-a pan
-{Player}'s phone
-an apple
-{Player}'s glasses
-{Player}'s hidden journal
-{Player}'s pants
 jogging pants
-{Player}'s clothes
-{Player}'s underwear
-an egg
 a chicken
 a dog
 world piece
@@ -20,3 +8,9 @@ expired milk
 [object Object]
 □
 Chicken McNuggets®
+
+the Internet Explorer
+an internal hard drive with 10 bitcoins
+love at first sight
+a school bus full of children
+a new-born baby

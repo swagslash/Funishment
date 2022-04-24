@@ -14,9 +14,11 @@ in a hidden basement
 in Area 51
 in the hollow earth
 in Uranus
-in the {Player}'s home
-in the {Player}'s bedroom
-in the {Player}'s bathroom
+in {Player}'s bedroom
 in the favelas of Rio de Janeiro
 on the most suspicious toilet
-on the trending subreddit
+
+an adoption center
+in the YouTube comment section
+at a COVID test station
+in the garden of Eden
