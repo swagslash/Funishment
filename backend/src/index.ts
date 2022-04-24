@@ -2,21 +2,21 @@ import * as express from 'express';
 import * as http from 'http';
 import * as npmlog from 'npmlog';
 import { Server } from 'socket.io';
-import { CardType } from './model/card';
+import { Card, CardType } from './model/card';
 import { GamePhase } from './model/game-state';
 import { Player } from './model/player';
 import { PunishmentCondition } from './model/punishment';
 import { Room } from './model/room';
 import {
   addCard,
-  assignCardMetadata,
+  assignCardMetadata, CARDS_PER_CATEGORY, CATEGORY_COUNT,
   createNewPlayerCard,
   createNewPunishmentCard,
   generatePlayerCards,
   getCardVotingScore,
   getTopMostCards,
   handoutCards,
-  refillHand,
+  refillHand, refillWithPredefinedCards,
   removeCardFromHand,
   voteForCard,
 } from './server/core/card-manager';
@@ -47,8 +47,6 @@ const PUNISHMENT_LOG_PREFIX = 'punishment';
 const CARDS_LOG_PREFIX = 'cards';
 const ROUND_LOG_PREFIX = 'round';
 
-const CATEGORY_COUNT = 4;
-const CARDS_PER_CATEGORY = 2;
 const ROUNDS_TO_PLAY = 5;
 
 const app = express();
@@ -133,13 +131,13 @@ io.on('connection', (socket) => {
 
     removeInternalState(room.id);
     internalState = createInternalState(room);
+    internalState.predefinedCards = loadCardsForAllTypes(room.nsfw, room.players.map((p) => p.name), internalState);
 
     room.open = false;
 
     socket.emit('update', internalState.gameState);
     socket.to(room.id)
         .emit('update', internalState.gameState);
-
   });
 
   socket.on('createPunishment', (punishmentText: string) => {
@@ -147,9 +145,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    if (!internalState) {
-      internalState = getInternalState(room.id);
-    }
+    internalState = getInternalState(room.id);
 
     if (internalState.gameState.phase !== GamePhase.PunishmentCreation) {
       npmlog.warn(PUNISHMENT_LOG_PREFIX, '[Creation] Invalid state: Room %s, player %s, phase: %s', room.id, player.name, internalState.gameState.phase);
@@ -220,25 +216,25 @@ io.on('connection', (socket) => {
       return;
     }
 
+    const intermediatePool: Card[] = [];
     for (const {type, text} of cards) {
       const card = createNewPlayerCard(text, type);
       assignCardMetadata(card, player, internalState);
-
-      internalState.cardPool.push(card);
+      intermediatePool.push(card);
     }
+
+    refillWithPredefinedCards(intermediatePool, internalState);
+
+    internalState.cardPool.push(...intermediatePool);
 
     // All players created cards => proceed to card placement
     if (internalState.cardPool.length === room.players.length * CARDS_PER_CATEGORY * CATEGORY_COUNT) {
       npmlog.info(CARDS_LOG_PREFIX, 'All players in room %s created cards', room.id);
       const playerCards = generatePlayerCards(internalState);
-      internalState.cardPool.push(...playerCards);
+      // internalState.cardPool.push(...playerCards);
 
       // Load predefined cards and questions
-      internalState.predefinedCards = [
-        ...loadCardsForAllTypes(room.nsfw, room.players.map((p) => p.name)),
-        ...playerCards,
-      ];
-      internalState.questions = loadQuestions(room.nsfw, internalState.cardPool, internalState.predefinedCards);
+      internalState.questions = loadQuestions(room.nsfw, [...internalState.cardPool, ...playerCards], internalState.predefinedCards);
 
       handoutCards(internalState);
 
@@ -356,6 +352,8 @@ io.on('connection', (socket) => {
     if (player && room) {
       removePlayer(player);
       closeRoom(room);
+
+      removeInternalState(room.id);
 
       socket.leave(room.id);
       socket.to(room.id)

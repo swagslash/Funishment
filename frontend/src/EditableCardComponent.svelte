@@ -7,6 +7,7 @@
 
     export let cardType: CardType;
     export let currentPlayer: Player;
+    export let skippable: boolean = false;
 
     let textarea;
     let userInput: string;
@@ -15,16 +16,16 @@
         [CardType.Object, "an object"],
         [CardType.Activity, "an activity"],
         [CardType.Person, "a person"],
-        [CardType.Place, "a place"],
+        [CardType.Place, "a place (including the preposition)"],
         [CardType.Punishment, "the punishment."],
     ]);
 
     const typeToExampleMap = new Map<CardType, string[]>([
         [CardType.Object, ["women", "a clown car", "3 liters of coffee"]],
-        [CardType.Activity, ["going shopping", "eating lunch together"]],
-        [CardType.Person, ["my neighbor"]],
+        [CardType.Activity, ["going shopping with your mom", "eating pancakes together", "petting ducks"]],
+        [CardType.Person, ["my weird neighbor", "a hyperactive kid", "your step-sister"]],
         [CardType.Place, ["in a dark alley", "on the toilet", "behind the moon"]],
-        [CardType.Punishment, ["Sexually eat a banana ;)", "Run around the building", "Do 10 one-handed push-ups, maggot!"]],
+        [CardType.Punishment, ["sexually eat a banana", "run around the building", "do 10 one-handed push-ups, maggot!"]],
     ]);
 
     function getRandomExample(t: CardType): string {
@@ -41,6 +42,13 @@
         userInput = '';
         textarea.focus()
     }
+
+    function onSkip() {
+        console.log("skipped card");
+        dispatch("cardCreated", undefined);
+        userInput = '';
+        textarea.focus()
+    }
 </script>
 
 <div class="justify-content-center">
@@ -54,6 +62,9 @@
         </div>
         <div class="card-footer">
             <button on:click={onSubmit} disabled={!userInput} class="btn btn-outline-primary">Submit</button>
+            {#if skippable}
+                <button on:click={onSkip} class="btn btn-outline-warning">Skip</button>
+            {/if}
         </div>
     </div>
 </div>

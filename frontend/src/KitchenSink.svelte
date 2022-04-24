@@ -1,7 +1,8 @@
 <script lang="ts">
+    import ScoreList from "src/ScoreList.svelte";
     import {Question} from "./model/question";
     import QuestionComponent from "./QuestionComponent.svelte";
-    import {Player} from "src/model/player";
+    import { Player, PlayerState } from 'src/model/player';
     import {Card, CardType, PlayedCard} from "src/model/card";
     import CardPresenter from "src/CardPresenter.svelte";
     import CardCreatorComponent from "src/CardCreatorComponent.svelte";
@@ -65,13 +66,48 @@
             votes: 2
         }]
     let exampleQuestion: Question = {text: "How fat is Andi's aunt?"}
+
+    let playerState: PlayerState[] = [
+      {
+        player: { name: 'Alex', id: '1'},
+        hand: [],
+        connected: false,
+        score: 11,
+      },
+      {
+        player: { name: 'Andi', id: '2'},
+        hand: [],
+        connected: false,
+        score: 0,
+      },
+      {
+        player: { name: 'Bache', id: '3'},
+        hand: [],
+        connected: false,
+        score: 7,
+      },
+      {
+        player: { name: 'Wede', id: '4'},
+        hand: [],
+        connected: false,
+        score: 1,
+      },
+      {
+        player: { name: 'Pete', id: '5'},
+        hand: [],
+        connected: false,
+        score: 7,
+      },
+    ];
 </script>
 
-<QuestionComponent question="{exampleQuestion}"></QuestionComponent>
-<CardPresenter animationDuration={100} slideTime={200} currentPlayerId="2" playedCards="{playedCards}"></CardPresenter>
-<CardCreatorComponent punishment="{exampleCardPunischment}"></CardCreatorComponent>
-<PunishmentCreatorComponent></PunishmentCreatorComponent>
-<HandCards canPlay={true} cards={cards}></HandCards>
+<ScoreList playerStates="{playerState}"></ScoreList>
+
+<!--<QuestionComponent question="{exampleQuestion}"></QuestionComponent>-->
+<!--<CardPresenter animationDuration={100} slideTime={200} currentPlayerId="2" playedCards="{playedCards}"></CardPresenter>-->
+<!--<CardCreatorComponent punishment="{exampleCardPunischment}"></CardCreatorComponent>-->
+<!--<PunishmentCreatorComponent></PunishmentCreatorComponent>-->
+<!--<HandCards canPlay={true} cards={cards}></HandCards>-->
 <!--<div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-1">-->
 <!--    <CardComponent text="Your momma" card="{exampleCard}"></CardComponent>-->
 <!--    <CardComponent text="Your momma" isWinner score="{5}" card="{exampleCard}"></CardComponent>-->

@@ -3,6 +3,7 @@
 
     export let lobbyId: string;
     export let username: string;
+    export let isNsfw: boolean = true;
     export let roomNotFound: boolean;
 
     const dispatch = createEventDispatcher();
@@ -14,7 +15,7 @@
     }
 
     function onCreateOrJoin() {
-        dispatch('join', {username, lobbyId});
+        dispatch('join', {username, lobbyId, isNsfw});
     }
 </script>
 
@@ -34,8 +35,8 @@
                    placeholder="Lobby id (leave blank to create)">
         </div>
         <div class="form-group" hidden={lobbyId}>
-            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-            <label class="form-check-label" for="flexCheckChecked">
+            <input class="form-check-input" bind:checked={isNsfw} type="checkbox" value="" id="nsfw">
+            <label class="form-check-label" for="nsfw">
                 Enable NSFW content 🥵🍆
             </label>
         </div>

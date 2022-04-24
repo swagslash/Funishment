@@ -6,6 +6,9 @@ import { InternalState } from './state';
 const CARD_MANAGER_LOG_PREFIX = 'card-manager';
 const MAX_PLAYER_CARDS = 12;
 
+export const CATEGORY_COUNT = 4;
+export const CARDS_PER_CATEGORY = 2;
+
 /**
  * Assign card metadata: card id and author
  * @param card
@@ -78,6 +81,29 @@ export const createNewPlayerCard = (text: string, type: CardType): Card => {
   };
 };
 
+const refillForCardForType = (type: CardType, pool: Card[], state: InternalState): void => {
+  const cards = pool.filter((c) => c.type === type);
+  const predefined = state.predefinedCards.filter((p) => p.type === type);
+
+  for (let i = 0; i < CARDS_PER_CATEGORY - cards.length; i++) {
+    const index = Math.floor(Math.random() * predefined.length);
+    const card = {
+      ...predefined[index],
+    };
+
+    assignCardMetadata(card, undefined, state);
+
+    pool.push(card);
+  }
+};
+
+export const refillWithPredefinedCards = (pool: Card[], state: InternalState): void => {
+  refillForCardForType(CardType.Person, pool, state);
+  refillForCardForType(CardType.Object, pool, state);
+  refillForCardForType(CardType.Place, pool, state);
+  refillForCardForType(CardType.Activity, pool, state);
+};
+
 export const generatePlayerCards = (state: InternalState): Card[] => {
   return state.gameState.playerState.map(({player}) => {
     const card: Card = {
@@ -112,7 +138,7 @@ export const handoutCards = ({cardPool, gameState}: InternalState): void => {
   const playedCardIds: number[] = [];
 
   for (const {hand} of gameState.playerState) {
-    hand.push(getNewCard(CardType.Player, playedCardIds, cardPool));
+    // hand.push(getNewCard(CardType.Player, playedCardIds, cardPool));
 
     for (let i = 0; i < 2; i++) {
       hand.push(getNewCard(CardType.Person, playedCardIds, cardPool));

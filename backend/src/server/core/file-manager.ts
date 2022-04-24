@@ -1,11 +1,8 @@
 import * as fs from "fs";
-import * as npmlog from 'npmlog';
 import {Card, CardType} from "../../model/card";
 import {Question} from "../../model/question";
-
-let nextId = 0;
-let nextCardId = () => nextId++;
-const PROB_USER_CARD_FILLS_QUESTION = .8;
+import { assignCardMetadata } from './card-manager';
+import { InternalState } from './state';
 
 /**
  * Loads all the string lines from the file path.
@@ -44,8 +41,9 @@ export const parseCardText = (cardText: string, playerNames: string[]): string =
  * @param cardType
  * @param nsfw
  * @param playerNames
+ * @param internalState
  */
-export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsfw: boolean, playerNames: string[]): Card[] => {
+export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsfw: boolean, playerNames: string[], internalState: InternalState): Card[] => {
     let cardTexts: string[] = [];
 
     if (nsfw) {
@@ -55,27 +53,26 @@ export const loadCardsForType = (cardTypeString: string, cardType: CardType, nsf
 
     return cardTexts.filter(text => text !== '').map((text) => {
         let card: Card = {
-            id: nextCardId(),
+            id:-1,
             type: cardType,
-            author: null,
             text: parseCardText(text, playerNames)
         };
+        assignCardMetadata(card, undefined, internalState);
+
         return card;
     });
 };
 
 /**
  * Loads all cards for all types in one large array.
- * @param nsfw
- * @param playerNames
  */
-export const loadCardsForAllTypes = (nsfw: boolean, playerNames: string[]): Card[] => {
+export const loadCardsForAllTypes = (nsfw: boolean, playerNames: string[], internalState: InternalState): Card[] => {
     const cards: Card[] = [];
 
-    cards.push(...loadCardsForType('Activities', CardType.Activity, nsfw, playerNames));
-    cards.push(...loadCardsForType('Objects', CardType.Object, nsfw, playerNames));
-    cards.push(...loadCardsForType('Persons', CardType.Person, nsfw, playerNames));
-    cards.push(...loadCardsForType('Places', CardType.Place, nsfw, playerNames));
+    cards.push(...loadCardsForType('Activities', CardType.Activity, nsfw, playerNames, internalState));
+    cards.push(...loadCardsForType('Objects', CardType.Object, nsfw, playerNames, internalState));
+    cards.push(...loadCardsForType('Persons', CardType.Person, nsfw, playerNames, internalState));
+    cards.push(...loadCardsForType('Places', CardType.Place, nsfw, playerNames, internalState));
 
     // todo added for debug
     // cards.push(...(loadCardsForType('Persons', CardType.Player, nsfw, playerNames).slice(0, 3)));
@@ -148,11 +145,7 @@ export const parseQuestionText = (questionText: string, userCards: Card[], prede
         const rawPlaceholder: string = placeholder[0];
         let placeholderOptions: string[] = rawPlaceholder.slice(1, -1).split('|');
 
-        if (Math.random() < PROB_USER_CARD_FILLS_QUESTION) {
-            replacementCards.push(getCardForTypePlaceholder(placeholderOptions, userCards, replacementCards))
-        } else {
-            replacementCards.push(getCardForTypePlaceholder(placeholderOptions, predefinedCards, replacementCards))
-        }
+        replacementCards.push(getCardForTypePlaceholder(placeholderOptions, userCards.concat(predefinedCards), replacementCards))
     });
 
     // replace placeholders by cards
@@ -182,7 +175,7 @@ export const loadQuestions = (nsfw: boolean, userCards: Card[], predefinedCards:
     }
     questionTexts = questionTexts.concat(loadLinesFromDisk('./resources/content/questions/SFWQuestions.txt'));
 
-    let questions = questionTexts
+    return questionTexts
         .filter(text => text !== '')
         .sort(() => 0.5 - Math.random()) // shuffle
         .slice(0, nrQuestions)
@@ -194,8 +187,6 @@ export const loadQuestions = (nsfw: boolean, userCards: Card[], predefinedCards:
             }
             return question;
         });
-
-    return questions;
 };
 
 
