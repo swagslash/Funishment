@@ -50,11 +50,10 @@ export const removePlayer = (player: Player): void => {
 
 /**
  * Create a new room with a random id
- * @param host The room host
  */
-export const createRoom = (host: Player): Room => {
+export const createRoom = (host: Player, nsfw: boolean): Room => {
   const id = generateRoomId();
-  const room: Room = {id, open: true, players: [host], host, nsfw: true};
+  const room: Room = {id, open: true, players: [host], host, nsfw};
   rooms.push(room);
 
   npmlog.info(ROOM_LOG_PREFIX, 'New room %s created with host player %s', room.id, host);

@@ -20,7 +20,7 @@ socket.on('connect', () => {
 });
 
 if (roomToJoin === undefined) {
-  socket.emit('createRoom', playerName);
+  socket.emit('createRoom', playerName, true);
 } else {
   socket.emit('joinRoom', playerName, roomToJoin);
 }

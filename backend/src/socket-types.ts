@@ -1,12 +1,13 @@
 import { CardType } from './model/card';
 import { GameState } from './model/game-state';
+import { Player } from './model/player';
 import { Room } from './model/room';
 
 export interface ServerToClientEvents {
   // Room actions
   roomCreated: (room: Room) => void;
   roomUpdated: (room: Room) => void;
-  roomClosed: () => void;
+  roomClosed: (disconnectedPlayer: Player) => void;
   roomNotFound: () => void;
 
   /**
@@ -18,7 +19,7 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
   // Room actions
-  createRoom: (playerName: string) => void;
+  createRoom: (playerName: string, nsfw: boolean) => void;
   joinRoom: (playerName: string, roomId: string) => void;
   leaveRoom: () => void;
 

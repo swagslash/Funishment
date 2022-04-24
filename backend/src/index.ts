@@ -29,7 +29,15 @@ import {
   getVotedPunishment,
   removeInternalState,
 } from './server/core/game-manager';
-import { closeRoom, createOrGetPlayer, createRoom, getRoom, joinRoom, leaveRoom, removePlayer } from './server/core/room-manager';
+import {
+  closeRoom,
+  createOrGetPlayer,
+  createRoom,
+  getRoom,
+  joinRoom,
+  leaveRoom,
+  removePlayer,
+} from './server/core/room-manager';
 import { InternalState } from './server/core/state';
 import { ClientToServerEvents, ServerToClientEvents, ServerToServerEvents } from './socket-types';
 
@@ -69,7 +77,7 @@ io.on('connection', (socket) => {
 
   npmlog.info(SERVER_LOG_PREFIX, 'New connection: %s', socket.id);
 
-  socket.on('createRoom', (playerName: string) => {
+  socket.on('createRoom', (playerName: string, nsfw: boolean) => {
     if (room && player) {
       // Leave old room if player tries to create a new room
       socket.leave(room.id);
@@ -77,7 +85,7 @@ io.on('connection', (socket) => {
     }
 
     player = createOrGetPlayer(playerName, socket.id);
-    room = createRoom(player);
+    room = createRoom(player, nsfw);
 
     socket.join(room.id);
     socket.emit('roomCreated', room);
@@ -109,7 +117,7 @@ io.on('connection', (socket) => {
       socket.emit('roomUpdated', room);
     } else {
       // Game is open, no new players allowed
-      socket.emit('roomClosed');
+      socket.emit('roomClosed', player);
     }
   });
 
@@ -349,9 +357,10 @@ io.on('connection', (socket) => {
       removePlayer(player);
       closeRoom(room);
 
+      socket.leave(room.id);
       socket.to(room.id)
-        .emit('roomClosed');
-      socket.emit('roomClosed');
+        .emit('roomClosed', player);
+      socket.emit('roomClosed', player);
     }
   });
 

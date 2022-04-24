@@ -148,9 +148,6 @@ export const calculateHiddenPunishment = ({hiddenPunishments, gameState}: Intern
     targets: [lastPlayer],
     card: hiddenPunishments.shift(),
   };
-
-
-
 };
 
 const updateScore = (player: Player | undefined, score: number, state: GameState): void => {
