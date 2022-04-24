@@ -30,7 +30,6 @@ import {
   removeInternalState,
 } from './server/core/game-manager';
 import {
-  closeRoom,
   createOrGetPlayer,
   createRoom,
   getRoom,
@@ -351,7 +350,7 @@ io.on('connection', (socket) => {
 
     if (player && room) {
       removePlayer(player);
-      closeRoom(room);
+      // closeRoom(room);
 
       removeInternalState(room.id);
 
