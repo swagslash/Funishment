@@ -7,6 +7,7 @@
 
     export let cardType: CardType;
     export let currentPlayer: Player;
+    export let skippable: boolean = false;
 
     let textarea;
     let userInput: string;
@@ -41,6 +42,13 @@
         userInput = '';
         textarea.focus()
     }
+
+    function onSkip() {
+        console.log("skipped card");
+        dispatch("cardCreated", undefined);
+        userInput = '';
+        textarea.focus()
+    }
 </script>
 
 <div class="justify-content-center">
@@ -54,6 +62,9 @@
         </div>
         <div class="card-footer">
             <button on:click={onSubmit} disabled={!userInput} class="btn btn-outline-primary">Submit</button>
+            {#if skippable}
+                <button on:click={onSkip} class="btn btn-outline-warning">Skip</button>
+            {/if}
         </div>
     </div>
 </div>

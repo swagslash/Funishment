@@ -26,12 +26,16 @@
     let userCards: Card[] = [];
 
     function addCard(e: any) {
+
         console.log(e.detail);
-        const newCard: Card = e.detail
-        newCard.author = {id: '', name: 'you'}
-        userCards.push(newCard);
-        // Trigger change detection
-        userCards = userCards;
+
+        if (e.detail) {
+            const newCard: Card = e.detail
+            newCard.author = {id: '', name: 'you'}
+            userCards.push(newCard);
+            // Trigger change detection
+            userCards = userCards;
+        }
 
         index++;
         if (index < requestedTypes.length) {
@@ -46,7 +50,10 @@
 {#if currentType}
     <h2>Add your own answer cards</h2>
     <h3>They will be distributed to players after everybody is done.</h3>
-    <EditableCardComponent cardType="{currentType}" on:cardCreated={addCard}></EditableCardComponent>
+    <EditableCardComponent skippable={currentType !== CardType.Punishment}
+                           cardType={currentType}
+                           on:cardCreated={addCard}>
+    </EditableCardComponent>
 {:else}
     <h2>Waiting for other players to finish their answers.</h2>
     <p>You can admire your answers for now and lough at how funny you are.</p>
