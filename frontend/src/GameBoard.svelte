@@ -90,18 +90,21 @@
                 <CardPresenter currentPlayerId={userId} playedCards={game.playedCards}
                                on:voted={sendVotes}></CardPresenter>
             {:else if game.phase === GamePhase.CardResults}
-                <VotingResultComponent currentPlayerId={userId} playedCards={game.playedCards}></VotingResultComponent>
+                <h2>Voting results are in!</h2>
                 <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
+                <VotingResultComponent currentPlayerId={userId} playedCards={game.playedCards}></VotingResultComponent>
 
                 {#if isHost}
                     <button class="btn btn-primary" on:click={sendNextRound}>Next round</button>
+                {:else}
+                    <p class="text-white">Waiting for host to advance round.</p>
                 {/if}
             {/if}
         {:else if game.phase === GamePhase.Scoreboard}
             <!-- endgame -->
-            <ScoreList playerStates={game.playerState}></ScoreList>
+            <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
             <div style="padding: 0 10px">
-                <PunishmentDisplayComponent punishment={game.appliedPunishment}></PunishmentDisplayComponent>
+                <ScoreList playerStates={game.playerState}></ScoreList>
             </div>
             {#if isHost}
                 <button class="btn btn-primary" on:click={continuePlaying}>New game with same players</button>

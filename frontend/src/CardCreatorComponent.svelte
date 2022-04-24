@@ -48,15 +48,16 @@
 </script>
 
 {#if currentType}
-    <h2>Add your own answer cards</h2>
-    <h3>They will be distributed to players after everybody is done.</h3>
+    <h2>Create answer cards</h2>
+    <p>Think about funny answers for five generated questions.<br>
+        We will shuffle and deal the answer cards to all players.</p>
     <EditableCardComponent skippable={currentType !== CardType.Punishment}
                            cardType={currentType}
                            on:cardCreated={addCard}>
     </EditableCardComponent>
 {:else}
     <h2>Waiting for other players to finish their answers.</h2>
-    <p>You can admire your answers for now and lough at how funny you are.</p>
+    <p>You can admire your answers and laugh at how funny you are.</p>
 {/if}
 <div style="margin-top: 10px" class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-lg-4 row-cols-xl-4 g-1">
     {#each userCards as card}

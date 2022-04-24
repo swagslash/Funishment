@@ -200,7 +200,7 @@
 
     socket.on('update', (_game: GameState) => {
         console.log("update received");
-        console.log( JSON.stringify(_game));
+        console.log(JSON.stringify(_game));
         game = _game;
     });
 

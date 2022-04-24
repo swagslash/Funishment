@@ -55,10 +55,12 @@
 
 {#if finishedSlideshow}
     <div>
+        <h2>Vote for your favourite answer:</h2>
         <VotingComponent currentPlayerId={currentPlayerId} cards="{playedCards}" on:voted></VotingComponent>
     </div>
 {:else}
-    <div >
+    <h2>All your answers:</h2>
+    <div>
         {#if index % 2 === 0 && visibleFirst}
             <div class="presented" in:fly="{{ x: +200, duration: animationDuration }}"
                  out:fly="{{ x: -200, duration: animationDuration }}">

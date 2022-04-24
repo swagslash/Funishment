@@ -13,10 +13,10 @@
     let userInput: string;
 
     const typeToStringMap = new Map<CardType, string>([
-        [CardType.Object, "an object"],
-        [CardType.Activity, "an activity"],
-        [CardType.Person, "a person"],
-        [CardType.Place, "a place (including the preposition)"],
+        [CardType.Object, "any object"],
+        [CardType.Activity, "any activity"],
+        [CardType.Person, "any person"],
+        [CardType.Place, "any place (including its preposition)"],
         [CardType.Punishment, "the punishment."],
     ]);
 
