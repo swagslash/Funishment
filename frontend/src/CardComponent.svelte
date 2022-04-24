@@ -43,6 +43,16 @@
             dispatch("play", {id: card.id});
         }
     }
+
+    function getVotePlural(score: number) {
+        if (score === 0) {
+            return "No Votes";
+        } else if (score === 1) {
+            return "1 Vote";
+        } else {
+            return score + " Votes"
+        }
+    }
 </script>
 
 <div class="col">
@@ -52,7 +62,8 @@
             <div class="card-header"
                  class:bg-warning={isWinner}
                  class:bg-secondary={!isWinner}>
-                {#if isWinner}⭐{/if}{votes} Votes
+                {#if isWinner}⭐{/if}
+                {getVotePlural(votes)}
                 {#if isWinner}⭐{/if}
             </div>
         {:else if showType}
