@@ -26,22 +26,24 @@ Who or what do you find {Place}?
 Finally, I did it! I created {_}!
 Who would love to live {Place}?
 What does {Player|Person} secretly have on their phone?
-If {Person|Player} was a hunter what would be the prey?
+If {Person|Player} was a hunter what would be their prey?
 What does {Player|Person} spend their free time on?
 What is {Player|Person} famous for?
-{Object} is not an option but {_} is.
-{Activity} is nothing without {_}.
+{Object} is not an option. But {_} is.
+{Activity|Object} is nothing without {_}.
 {Person} has a secret folder full of {_}.
-Who lives in {Object} under the sea?
-If {Player} was a sleep walker where would he go?
-{Activity} is not allowed here but {_} is.
-Watch out! There is {Player} with a {_}.
-If you cross {Player|Person|Object} with {Player|Person|Object}, you will get?
-What would you do instead of {Activity}?
+Who lives in a pineapple under the sea?
+If {Player} was a sleep walker where would they go?
+{Activity} is not allowed here. But {_} is.
+Walking is not allowed here. But {_} is.
+Watch out! There is a bear with a {_}.
+If you cross {Player|Person|Object} with {Player|Person|Object}, what will you get?
+What is your alternative to {Activity}?
 What is {Player|Person}'s biggest fear?
 What is {Player|Person}'s proudest possession?
-{_} is the new {Activity|Object}.
+{_} is THE new {Activity|Object}.
 Who is {Player|Person}'s secret lover?
-If {Player}'s house is on fire what will be the first thing they would grab?
+{Player}'s house is on fire. What is the first thing they grab?
 Don't look! Here comes {Player} with {_}.
 They don't call {Player} {_} without a reason.
+What is not recommended by nine out of ten dentists?
