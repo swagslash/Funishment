@@ -4,7 +4,7 @@
     "build": "cross-env NODE_ENV=production webpack",
     "dev": "webpack serve",
     "start": "serve public --listen 8080",
-    "start-prod": "serve public --listen 80",
+    "start:prod": "serve public --listen 80",
     "validate": "svelte-check"
   },
   "devDependencies": {
