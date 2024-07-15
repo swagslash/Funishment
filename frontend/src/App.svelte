@@ -29,6 +29,7 @@
                        userId={userId}
                        players={room?.players ?? []}/>
         {:else}
+
             {#if username && room}
                 <div id="chat-container">
                     <PlayerList room={room} players={room.players} lobbyId={room.id} myUserId={userId}/>
@@ -46,6 +47,9 @@
                     {/if}
                 </div>
             {:else}
+                {#if isError}
+                    <p class="bg-danger badge" style="padding: 10px">Something went wrong connecting to the backend, try refreshing the page.</p>
+                {/if}
                 <div class="justify-content-center">
                     <LoginForm roomNotFound="{roomNotFound}" on:join={join}/>
                 </div>
@@ -141,10 +145,22 @@
     let roomNotFound: boolean = false;
     let startGameDisabled: boolean = false;
 
+    let isError: boolean = false;
+
     const kitchenSinkEnabled = false; // TODO set to false to game to work, ONLY USED FOR DEBGUGING COMPONENTS
 
-    // const socket = io('http://164.90.213.85:3000/');
-    const socket = io('http://localhost:3000');
+    const socket = io(`/`,
+        {
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            randomizationFactor: 0.5,
+            autoConnect: true,
+        });
+
+    socket.on('connect_error', err => isError = true)
+    socket.on('connect_failed', err => isError = true)
 
     socket.on('connect', () => {
         userId = socket.id
@@ -156,6 +172,7 @@
 
     function join(event) {
         const lobbyId = event.detail.lobbyId;
+
         username = event.detail.username;
         const isNsfw = event.detail.isNsfw;
 

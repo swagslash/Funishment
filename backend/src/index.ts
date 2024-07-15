@@ -51,6 +51,8 @@ const ROUNDS_TO_PLAY = 5;
 const app = express();
 const server = http.createServer(app);
 
+app.use(express.static('../frontend/public'));
+
 const start = async () => {
   server.listen(SERVER_PORT, () => {
     npmlog.info(SERVER_LOG_PREFIX, 'Starting server, listening at port %s', SERVER_PORT);
@@ -63,7 +65,7 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents, ServerToServer
   cors: {
     origin: '*',
     methods: ["GET", "POST"],
-    credentials: true,
+    credentials: false,
   },
 });
 
